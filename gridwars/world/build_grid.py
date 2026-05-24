@@ -4,7 +4,7 @@ GridWars.run -- initial sector build script.
 Run from repo root:
     cd gridwars && ../.venv/bin/python -c "import os, django; \\
       os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \\
-      django.setup(); from world import build_grid"
+      django.setup(); from world import build_grid; build_grid.build()"
 
 (Note: `evennia batchcode` is an in-game command for authenticated sessions,
  not a CLI subcommand. The Django shell setup above correctly initializes
@@ -174,4 +174,5 @@ def build():
     )
 
 
-build()
+if __name__ == "__main__":
+    build()
