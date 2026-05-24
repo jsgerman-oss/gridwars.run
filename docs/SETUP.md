@@ -70,3 +70,23 @@ make createsuperuser
 ```
 
 This account is the in-game `#1` character and the web-admin admin. Use a throwaway password for local dev.
+
+## Building the grid
+
+After `make install` and `make migrate`, populate the world with the five GridWars sectors:
+
+```bash
+cd gridwars && PATH="$(pwd)/../.venv/bin:$PATH" evennia batchcode world.build_grid
+```
+
+The script is idempotent — re-running it does NOT duplicate rooms (each is tagged `("gridwars-core", "world_build")` and reused if present). Fresh characters spawn in **Users' Sector** automatically via a tag-based `Account.create_character()` hook (gridwars/typeclasses/accounts.py).
+
+### Sectors and exits
+
+| Sector | Connects to |
+|---|---|
+| **Users' Sector** (spawn) | north -> Lightcycle Causeway, east -> Archive Node |
+| **Lightcycle Causeway** | south -> Users' Sector, east -> Daemon Gate |
+| **Daemon Gate** | west -> Lightcycle Causeway, north -> Combat Grid |
+| **Archive Node** | west -> Users' Sector |
+| **Combat Grid** | south -> Daemon Gate |
