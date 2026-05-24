@@ -72,7 +72,7 @@ class CmdScan(Command):
         if chars:
             out.append("|wPrograms here:|n")
             for ch in chars:
-                fac = ch.attributes.get("faction")
+                fac = getattr(ch, "faction", None)
                 color = _faction_color(fac)
                 tag = f" |w[|n{color}{fac}|n|w]|n" if fac else ""
                 out.append(f"  - {color}{ch.key}|n{tag}")
