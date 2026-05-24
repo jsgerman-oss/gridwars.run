@@ -3,13 +3,16 @@ GridWars.run combat commands.
 
 `strike <target>` — same-room PvP. Resolves target by name in caller's
 room contents, refuses self / cross-room / non-Character targets,
-deals BASE_DAMAGE + randint(0, RANDOM_BONUS_MAX), broadcasts messages.
+deals BASE_DAMAGE + randint(0, RANDOM_BONUS_MAX) + disc.damage_bonus,
+broadcasts messages. Cooldown enforced when a disc is equipped via
+caller.db.equipped_disc; timestamp tracked in caller.db.last_strike_time.
 On target.integrity == 0 → defeat flow: room derez message, move target
 to Users' Sector via tag lookup, target.reset_for_respawn(...),
 attacker.gain_experience(EXP_ON_VICTORY).
 
 Characters are NEVER deleted.
 """
+import time
 from random import randint
 from evennia import Command
 from evennia.utils.search import search_tag
@@ -69,10 +72,28 @@ class CmdStrike(Command):
             caller.msg("|rYou can only strike other characters.|n")
             return
 
-        amount = BASE_DAMAGE + randint(0, RANDOM_BONUS_MAX)
+        # Cooldown gate — enforced when a disc is equipped.
+        equipped = caller.db.equipped_disc
+        now = time.time()
+        last = caller.db.last_strike_time or 0.0
+        cooldown = equipped.cooldown_seconds if equipped else 0
+        if cooldown and (now - last) < cooldown:
+            remaining = cooldown - (now - last)
+            caller.msg(f"|yYour disc is still cycling — {remaining:.1f}s remaining.|n")
+            return
+
+        # Damage calc: base + jitter + disc bonus (0 when unequipped).
+        bonus = equipped.damage_bonus if equipped else 0
+        amount = BASE_DAMAGE + randint(0, RANDOM_BONUS_MAX) + bonus
         target.take_damage(amount)
 
-        caller.msg(f"|wYou strike|n |c{target.key}|n |wfor|n |y{amount}|n |wintegrity.|n")
+        # Stamp cooldown timestamp.
+        caller.db.last_strike_time = now
+
+        if equipped:
+            caller.msg(f"|wYou strike|n |c{target.key}|n |wwith|n {equipped.key} |wfor|n |y{amount}|n |wintegrity.|n")
+        else:
+            caller.msg(f"|wYou strike|n |c{target.key}|n |wfor|n |y{amount}|n |wintegrity.|n")
         target.msg(f"|c{caller.key}|n |rstrikes you for|n |y{amount}|n |rintegrity.|n")
         caller.location.msg_contents(
             f"|c{caller.key}|n strikes |c{target.key}|n!",
