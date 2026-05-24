@@ -1,0 +1,2 @@
+# Redirect www to apex
+https://www.gridwars.run/* https://gridwars.run/:splat 301
