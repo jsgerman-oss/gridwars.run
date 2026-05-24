@@ -1,0 +1,3 @@
+[submodule "vendor/evennia"]
+	path = vendor/evennia
+	url = https://github.com/evennia/evennia.git
