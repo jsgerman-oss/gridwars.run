@@ -16,6 +16,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 from commands.admin_discs import CmdSpawnDisc
+from commands.capture import CmdCapture
 from commands.combat import CmdStrike
 from commands.factions import CmdFaction
 from commands.scan import CmdScan
@@ -39,6 +40,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
+        self.add(CmdCapture())
         self.add(CmdFaction())
         self.add(CmdStrike())
         self.add(CmdStatus())
