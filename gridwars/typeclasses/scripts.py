@@ -12,7 +12,12 @@ just overloads its hooks to have it perform its function.
 
 """
 
+import random
+
 from evennia.scripts.scripts import DefaultScript
+
+
+PATROL_INTERVAL = 30  # seconds between ticks
 
 
 class Script(DefaultScript):
@@ -101,3 +106,43 @@ class Script(DefaultScript):
     """
 
     pass
+
+
+class DaemonPatrol(DefaultScript):
+    """Move every Daemon to a random adjacent sector on each tick.
+
+    Does NOT engage targets (DA3 adds sense+engage). Starts after a
+    one-interval delay so server boot settles before the first move.
+    """
+
+    def at_script_creation(self):
+        self.key = "daemon_patrol"
+        self.desc = "Daemon NPC patrol Script"
+        self.interval = PATROL_INTERVAL
+        self.persistent = True
+        self.start_delay = True
+
+    def at_repeat(self):
+        from typeclasses.daemons import Daemon
+
+        for daemon in Daemon.objects.all():
+            self._step_one(daemon)
+
+    def _step_one(self, daemon):
+        loc = daemon.location
+        if not loc:
+            return
+        exits = [e for e in loc.contents if e.destination is not None]
+        if not exits:
+            return
+        # Only move to gridwars-core tagged sectors, not Limbo or OOC areas.
+        valid_exits = [
+            e
+            for e in exits
+            if e.destination
+            and e.destination.tags.has("gridwars-core", category="world_build")
+        ]
+        if not valid_exits:
+            return
+        chosen = random.choice(valid_exits)
+        daemon.move_to(chosen.destination, quiet=True)

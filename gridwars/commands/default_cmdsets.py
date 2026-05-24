@@ -15,6 +15,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 """
 
 from evennia import default_cmds
+from commands.admin_daemon import CmdDaemonStart, CmdDaemonStop
 from commands.admin_discs import CmdSpawnDisc
 from commands.combat import CmdStrike
 from commands.factions import CmdFaction
@@ -44,6 +45,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdStatus())
         self.add(CmdScan())
         self.add(CmdSpawnDisc())
+        self.add(CmdDaemonStart())
+        self.add(CmdDaemonStop())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
