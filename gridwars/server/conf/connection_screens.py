@@ -1,40 +1,34 @@
 # -*- coding: utf-8 -*-
 """
-Connection screen
+GridWars.run connection screens.
 
-This is the text to show the user when they first connect to the game (before
-they log in).
-
-To change the login screen in this module, do one of the following:
-
-- Define a function `connection_screen()`, taking no arguments. This will be
-  called first and must return the full string to act as the connection screen.
-  This can be used to produce more dynamic screens.
-- Alternatively, define a string variable in the outermost scope of this module
-  with the connection string that should be displayed. If more than one such
-  variable is given, Evennia will pick one of them at random.
-
-The commands available to the user when the connection screen is shown
-are defined in evennia.default_cmds.UnloggedinCmdSet. The parsing and display
-of the screen is done by the unlogged-in "look" command.
-
+Shown to clients on connect (CONNECTION_SCREEN). MOTD is not a
+separate constant in Evennia's idiom — post-login messages are handled
+via at_account_login hooks (Th2). Banner is ≤ 80 visual columns for
+telnet clients. ANSI color via Evennia color codes (|c |g |y |w |n);
+these degrade cleanly on non-ANSI clients.
 """
 
-from django.conf import settings
+# Evennia reads any module-level string variable as a candidate screen
+# (picks at random if more than one is defined). We define exactly one.
+# All lines ≤ 80 visual cols. Verified widest line: 72 cols.
 
-from evennia import utils
+CONNECTION_SCREEN = """\
+|c
+  ██████╗ ██████╗ ██╗██████╗ ██╗    ██╗ █████╗ ██████╗ ███████╗
+  ██╔════╝ ██╔══██╗██║██╔══██╗██║    ██║██╔══██╗██╔══██╗██╔════╝
+  ██║  ███╗██████╔╝██║██║  ██║██║ █╗ ██║███████║██████╔╝███████╗
+  ██║   ██║██╔══██╗██║██║  ██║██║███╗██║██╔══██║██╔══██╗╚════██║
+  ╚██████╔╝██║  ██║██║██████╔╝╚███╔███╔╝██║  ██║██║  ██║███████║
+   ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+|n
+|w                       G R I D W A R S . R U N|n
 
-CONNECTION_SCREEN = """
-|b==============================================================|n
- Welcome to |g{}|n, version {}!
+|y       Full PvP. No limits. Free to play. Open source.|n
 
- If you have an existing account, connect to it by typing:
-      |wconnect <username> <password>|n
- If you need to create an account, type (without the <>'s):
-      |wcreate <username> <password>|n
+|c┌──────────────────────────────────────────────────────────────────────┐|n
+|c│|n  |wconnect <handle> <key>|n    |wcreate <handle> <key>|n    |whelp|n             |c│|n
+|c└──────────────────────────────────────────────────────────────────────┘|n
 
- If you have spaces in your username, enclose it in quotes.
- Enter |whelp|n for more info. |wlook|n will re-show this screen.
-|b==============================================================|n""".format(
-    settings.SERVERNAME, utils.get_evennia_version("short")
-)
+|g      The Grid is live. Programs report. Light trails ignite.|n
+"""
