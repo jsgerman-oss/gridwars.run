@@ -146,3 +146,20 @@ class DaemonPatrol(DefaultScript):
             return
         chosen = random.choice(valid_exits)
         daemon.move_to(chosen.destination, quiet=True)
+
+        # Sense: any non-Daemon Character in this room after moving?
+        if not daemon.location:
+            return
+        targets = [
+            obj for obj in daemon.location.contents
+            if obj is not daemon
+            and obj.is_typeclass("typeclasses.characters.Character", exact=False)
+            and getattr(obj, "faction", None) != "Daemons"
+        ]
+        if not targets:
+            return
+        # Engage: strike the first sensed target via the existing CmdStrike code
+        # path. execute_cmd triggers the full strike flow (damage, messages,
+        # defeat respawn, attacker XP) without duplicating any combat logic.
+        target = targets[0]
+        daemon.execute_cmd(f"strike {target.key}")
