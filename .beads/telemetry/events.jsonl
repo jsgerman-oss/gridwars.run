@@ -1,1 +1,6 @@
 {"ts": "2026-05-24T06:49:14.910580+00:00", "actor": "jayse", "action": "op.command", "target": "storage", "meta": {"args": "init", "cwd": "/Users/jayse/Code/gridwars.run"}}
+{"ts": "2026-05-24T07:06:43.923700+00:00", "actor": "jayse", "action": "op.command", "target": "platform", "meta": {"args": "--help", "cwd": "/Users/jayse/Code/gridwars.run"}}
+{"ts": "2026-05-24T07:06:47.471722+00:00", "actor": "jayse", "action": "op.command", "target": "platform", "meta": {"args": "launch --help", "cwd": "/Users/jayse/Code/gridwars.run"}}
+{"ts": "2026-05-24T07:06:47.547874+00:00", "actor": "jayse", "action": "platform.launch", "target": "--help", "meta": {"platform": "claude", "mux": "cmux", "session": "OK workspace:5"}}
+{"ts": "2026-05-24T07:06:47.606917+00:00", "actor": "jayse", "action": "op.command", "target": "platform", "meta": {"args": "list", "cwd": "/Users/jayse/Code/gridwars.run"}}
+{"ts": "2026-05-24T07:06:48.150431+00:00", "actor": "jayse", "action": "op.command", "target": "prime", "meta": {"args": "--help", "cwd": "/Users/jayse/Code/gridwars.run"}}
