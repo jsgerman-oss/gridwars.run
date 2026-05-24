@@ -1,0 +1,3 @@
+{"event": "delegation_check", "ts": "2026-05-24T07:22:50Z", "session_id": "10aa8b11-0826-4abf-a2ea-f3cea6e35d38", "tool": "Write", "count": 1, "action": "allow"}
+{"event": "delegation_check", "ts": "2026-05-24T07:23:00Z", "session_id": "10aa8b11-0826-4abf-a2ea-f3cea6e35d38", "tool": "Write", "count": 2, "action": "allow"}
+{"event": "delegation_check", "ts": "2026-05-24T07:23:09Z", "session_id": "10aa8b11-0826-4abf-a2ea-f3cea6e35d38", "tool": "Write", "count": 3, "action": "warn"}
