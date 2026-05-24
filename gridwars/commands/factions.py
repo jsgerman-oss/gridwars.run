@@ -46,7 +46,7 @@ class CmdFaction(Command):
             out.append(f"{color}{name}|n — |y{tagline}|n")
             out.append(f"  {desc}")
             out.append("")
-        current = caller.attributes.get("faction")
+        current = caller.faction
         if current:
             spec = get(current)
             color = spec["color"] if spec else "|w"
@@ -71,7 +71,7 @@ class CmdFaction(Command):
         canon = spec["name"]
         color = spec["color"]
         # One-shot: refuse re-choose unless admin
-        current = caller.attributes.get("faction")
+        current = getattr(caller, "faction", None)
         if current:
             caller.msg(
                 f"|yYou are already aligned with {current}.|n  Faction changes require admin override."
