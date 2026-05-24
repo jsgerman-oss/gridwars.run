@@ -19,6 +19,8 @@ from commands.admin_daemon import CmdDaemonStart, CmdDaemonStop
 from commands.admin_discs import CmdSpawnDisc
 from commands.capture import CmdCapture
 from commands.combat import CmdStrike
+from commands.duels import CmdAccept, CmdChallenge, CmdDecline
+from commands.equipment import CmdEquip, CmdInventory, CmdUnequip
 from commands.factions import CmdFaction
 from commands.scan import CmdScan
 from commands.status import CmdStatus
@@ -49,6 +51,12 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdSpawnDisc())
         self.add(CmdDaemonStart())
         self.add(CmdDaemonStop())
+        self.add(CmdEquip())
+        self.add(CmdUnequip())
+        self.add(CmdInventory())
+        self.add(CmdChallenge())
+        self.add(CmdAccept())
+        self.add(CmdDecline())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
