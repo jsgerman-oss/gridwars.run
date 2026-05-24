@@ -1,8 +1,14 @@
 """
 GridWars.run -- initial sector build script.
 
-Run via:
-    cd gridwars && evennia batchcode world.build_grid
+Run from repo root:
+    cd gridwars && ../.venv/bin/python -c "import os, django; \\
+      os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \\
+      django.setup(); from world import build_grid"
+
+(Note: `evennia batchcode` is an in-game command for authenticated sessions,
+ not a CLI subcommand. The Django shell setup above correctly initializes
+ Evennia's context and executes the build.)
 
 Idempotency strategy: skip-if-exists.
 Each room and exit is looked up by its unique slug tag before creation.

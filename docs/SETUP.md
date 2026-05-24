@@ -76,7 +76,9 @@ This account is the in-game `#1` character and the web-admin admin. Use a throwa
 After `make install` and `make migrate`, populate the world with the five GridWars sectors:
 
 ```bash
-cd gridwars && PATH="$(pwd)/../.venv/bin:$PATH" evennia batchcode world.build_grid
+cd gridwars && ../.venv/bin/python -c "import os, django; \
+  os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \
+  django.setup(); from world import build_grid"
 ```
 
 The script is idempotent — re-running it does NOT duplicate rooms (each is tagged `("gridwars-core", "world_build")` and reused if present). Fresh characters spawn in **Users' Sector** automatically via a tag-based `Account.create_character()` hook (gridwars/typeclasses/accounts.py).
