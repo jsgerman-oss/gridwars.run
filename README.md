@@ -10,11 +10,10 @@
 [![Engine](https://img.shields.io/badge/engine-Evennia_v6.0.0-green?style=flat-square)](vendor/evennia)
 [![CI](https://github.com/jsgerman-oss/gridwars.run/actions/workflows/test.yml/badge.svg?style=flat-square)](.github/workflows/test.yml)
 
-[**Quick start**](#quick-start) ·
+[**Play**](#play) ·
 [**Why GridWars**](#why-gridwars) ·
 [**Features**](#feature-catalog) ·
 [**Architecture**](#architecture) ·
-[**Self-host**](#self-host) ·
 [**Contributing**](#contributing)
 
 </div>
@@ -25,63 +24,22 @@
 
 GridWars.run is an open-source, text-based real-time PvP world built for the Grid — a cyber-digital arena inspired by TRON and classic digital combat aesthetics. Five sectors span the map: Users' Sector (the spawn point), Lightcycle Causeway, Daemon Gate, Archive Node, and Combat Grid. Choose your allegiance — **Users**, **Programs**, or **Daemons** — and traverse the causeway, breach the gate, or derez rival programs in the Combat Grid.
 
-Unlike modern pay-to-win MMOs, GridWars has no subscription, no cash shop, no character deletion, and no server-side secrets. Everything runs from a single `git clone`. Unlike classic AberMUD-era games, GridWars ships with a web client alongside the telnet port and is built on a modern Python 3.12 stack. It's designed for operators who want to run a world for themselves and their friends — and for contributors who want to extend it.
+Unlike modern pay-to-win MMOs, GridWars has no subscription, no cash shop, no character deletion, and no server-side secrets. Unlike classic AberMUD-era games, GridWars ships with a web client alongside the telnet port and is built on a modern Python 3.12 stack.
 
 The engine is Evennia v6.0.0 — a mature Python/Django MUD framework — vendored at `vendor/evennia/` and never modified. Game logic lives entirely in the `gridwars/` game directory. The full codebase is AGPL-3.0-or-later.
 
-If you want to play, see [Quick start](#quick-start). If you want to host or extend, see [Self-host](#self-host) and [Architecture](#architecture).
+If you want to play, see [Play](#play). If you want to contribute or run a local server for testing, see [Development](#development).
 
 ---
 
-## Quick start
+## Play
 
-**From clone to connected in five commands:**
+Connect to the official GridWars.run server:
 
-```bash
-git clone --recurse-submodules https://github.com/jsgerman-oss/gridwars.run.git
-cd gridwars.run
-make install          # one-time: creates .venv/ with Python 3.12, installs vendored Evennia
-make migrate          # one-time: initialise the SQLite DB (non-interactive)
-make createsuperuser  # interactive: create your in-game #1 character
-make run              # boot the server (telnet 4000, web 4001)
-```
+- **Telnet:** `telnet gridwars.run 4000`
+- **Web client:** <https://gridwars.run>
 
-Then connect:
-
-- **Telnet:** `telnet localhost 4000`
-- **Web client:** <http://localhost:4001>
-
-<details>
-<summary><b>Platform-specific prerequisites</b></summary>
-
-**macOS** (Intel + Apple Silicon)
-- Python 3.12+: `brew install python@3.12`
-- Git with submodule support is included in Xcode Command Line Tools
-- `make` is included in Xcode Command Line Tools
-
-**Linux** (Ubuntu / Debian / Fedora / Arch)
-- Python 3.12 + venv: `apt-get install python3.12 python3.12-venv` (or distro equivalent)
-- `make`, `git` via your package manager
-
-**Windows**
-- WSL2 is strongly recommended — Evennia is largely POSIX-oriented
-- Inside WSL2, follow the Linux instructions above
-
-</details>
-
-### Build the world
-
-`make run` boots an empty server. To populate the five sectors before players connect:
-
-```bash
-# After make migrate, before players log in — run the world build script:
-cd gridwars && ../.venv/bin/python -c "\
-import os, django; \
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \
-django.setup(); from world import build_grid"
-```
-
-The build is idempotent — running it twice leaves the world unchanged. Full setup procedure including update-after-pull: [`docs/SETUP.md`](docs/SETUP.md).
+> **Public server status: pre-launch.** The hosted server at gridwars.run is not yet deployed. Once it is live, you will be able to connect without installing anything.
 
 ### First playable commands
 
@@ -108,13 +66,13 @@ Once connected and faction-aligned (`faction choose Users` / `Programs` / `Daemo
 
 **Terminal-native, web-friendly.** Telnet on port 4000 for purists; Evennia's web client on port 4001 for everyone else. No mobile yet — that's on the roadmap.
 
-**Open-source AGPL.** The whole game is AGPL-3.0-or-later. Run your own server. Fork the rules. Ship a variant. The vendored Evennia layer keeps its BSD-3-Clause license untouched; our code is AGPL with no exceptions.
+**Open-source AGPL.** The whole game is AGPL-3.0-or-later. The vendored Evennia layer keeps its BSD-3-Clause license untouched; our code is AGPL with no exceptions.
 
 ### How GridWars compares
 
 | | GridWars.run | Generic commercial MMO | Generic AberMUD-era MUD |
 |---|:---:|:---:|:---:|
-| On-device server | ✅ | ✗ | Partial |
+| Hosted public server | ✅ | ✅ | ✗ |
 | Real-time PvP | ✅ | ✅ | Partial |
 | Faction-driven | ✅ | Partial | ✗ |
 | Open source | ✅ | ✗ | Partial |
@@ -252,23 +210,6 @@ flowchart LR
 
 ---
 
-## Self-host
-
-GridWars is designed to be self-hosted. There is no managed hosted version. The [Quick start](#quick-start) section gets you a local server; to run it as a persistent server for friends:
-
-- Bind to `0.0.0.0` instead of `localhost` in `gridwars/server/conf/settings.py` (`SERVER_HOSTNAME = "0.0.0.0"`)
-- Open ports **4000** (telnet) and **4001** (web client) on your network / firewall
-- Use `systemd`, `tmux`, or `screen` for persistence beyond your shell session
-- Back up `gridwars/server/evennia.db3` regularly — this is the full game state
-
-For a production-grade deployment (Postgres, reverse proxy, TLS):
-
-- Switch to Postgres by following Evennia's database configuration guide — the `vendor/evennia/` layer supports it fully; we haven't published a GridWars-specific runbook yet (`🛣️`)
-- Put nginx or Caddy in front of port 4001 for TLS termination
-- Evennia's process management integrates with standard `systemd` service units
-
----
-
 ## Customizing GridWars
 
 GridWars is structured for extension. Every game-specific concern lives in `gridwars/`; the vendored engine is never touched.
@@ -291,6 +232,7 @@ Full contributor guide: [`CONTRIBUTING.md`](CONTRIBUTING.md). AI agent guidance:
 
 | Feature | Status | Notes |
 |---|:---:|---|
+| Public server launch at gridwars.run | 🛣️ | Pending deploy — telnet gridwars.run 4000 / https://gridwars.run |
 | Lightcycle duels (instanced PvP) | 🛣️ | Faction-rivalry mechanic in the Causeway |
 | Daemon AI (autonomous NPCs) | 🛣️ | Patrol sector borders, attack on sight |
 | Sector ownership / capture | 🛣️ | Faction-controlled zones with permission semantics |
@@ -305,9 +247,57 @@ Full contributor guide: [`CONTRIBUTING.md`](CONTRIBUTING.md). AI agent guidance:
 
 ## Development
 
+Want to contribute? Run a local server to test your changes:
+
 ```bash
 git clone --recurse-submodules https://github.com/jsgerman-oss/gridwars.run.git
 cd gridwars.run
+make install          # creates .venv/ with Python 3.12, installs vendored Evennia
+make migrate          # one-time: initialise the SQLite DB (non-interactive)
+make createsuperuser  # interactive: create your in-game #1 character
+make run              # boot the server (telnet localhost 4000, web localhost 4001)
+```
+
+Then connect locally:
+
+- **Telnet:** `telnet localhost 4000`
+- **Web client:** <http://localhost:4001>
+
+<details>
+<summary><b>Platform-specific prerequisites</b></summary>
+
+**macOS** (Intel + Apple Silicon)
+- Python 3.12+: `brew install python@3.12`
+- Git with submodule support is included in Xcode Command Line Tools
+- `make` is included in Xcode Command Line Tools
+
+**Linux** (Ubuntu / Debian / Fedora / Arch)
+- Python 3.12 + venv: `apt-get install python3.12 python3.12-venv` (or distro equivalent)
+- `make`, `git` via your package manager
+
+**Windows**
+- WSL2 is strongly recommended — Evennia is largely POSIX-oriented
+- Inside WSL2, follow the Linux instructions above
+
+</details>
+
+### Build the world
+
+`make run` boots an empty server. To populate the five sectors before players connect:
+
+```bash
+# After make migrate, before players log in — run the world build script:
+cd gridwars && ../.venv/bin/python -c "\
+import os, django; \
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \
+django.setup(); from world import build_grid"
+```
+
+The build is idempotent — running it twice leaves the world unchanged. Full setup procedure including update-after-pull: [`docs/SETUP.md`](docs/SETUP.md).
+
+### Make targets
+
+```bash
 make install        # creates .venv/, installs vendored Evennia editable
 make migrate        # one-time DB init
 make test           # runs 34 tests via evennia test .
@@ -355,8 +345,8 @@ Vendored Evennia retains its [BSD-3-Clause](vendor/evennia/LICENSE.txt) license,
 
 ## See also
 
-- [`CHANGELOG.md`](CHANGELOG.md) — version history (stub pending; `v0.1.0` is the first release milestone)
-- [`SECURITY.md`](SECURITY.md) — vulnerability reporting policy (stub pending; report via GitHub Security Advisories)
+- [`CHANGELOG.md`](CHANGELOG.md) — version history
+- [`SECURITY.md`](SECURITY.md) — vulnerability reporting via GitHub Security Advisories
 - [Evennia](https://www.evennia.com) — the engine GridWars extends
 - [Evennia v6.0.0 release](https://github.com/evennia/evennia/releases/tag/v6.0.0) — pinned upstream version
 
