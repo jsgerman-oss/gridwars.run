@@ -6,9 +6,24 @@
           {
             "command": "bd prime",
             "type": "command"
+          },
+          {
+            "command": "gt tokens checkpoint --trigger pre-compact --note 'PreCompact-auto' 2\u003e/dev/null || true",
+            "type": "command"
           }
         ],
         "matcher": ""
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "bin/knowledge-skill-audit.sh 2\u003e/dev/null || true",
+            "type": "command"
+          }
+        ],
+        "matcher": "Skill"
       }
     ],
     "SessionStart": [
@@ -17,10 +32,25 @@
           {
             "command": "bd prime",
             "type": "command"
+          },
+          {
+            "command": "gt tokens restore --latest --format compact 2\u003e/dev/null || true",
+            "type": "command"
           }
         ],
         "matcher": ""
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(op aigc-commit:*)",
+      "Bash(bin/aigc-shim:*)",
+      "Bash(./bin/aigc-shim:*)",
+      "Bash(git commit -m:*)",
+      "Bash(git commit -F:*)",
+      "Bash(git commit:*)",
+      "Bash(aigc commit:*)"
     ]
   }
 }
