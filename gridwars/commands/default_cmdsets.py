@@ -15,6 +15,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 """
 
 from evennia import default_cmds
+from commands.admin_discs import CmdSpawnDisc
 from commands.combat import CmdStrike
 from commands.factions import CmdFaction
 from commands.scan import CmdScan
@@ -42,6 +43,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdStrike())
         self.add(CmdStatus())
         self.add(CmdScan())
+        self.add(CmdSpawnDisc())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
