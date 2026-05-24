@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "gridwars_run",
+  "project_id": "a8ad9066-2ca3-491f-853c-c170432447d2"
+}
