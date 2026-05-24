@@ -38,6 +38,22 @@ from evennia.settings_default import *
 # This is the name of your game. Make it catchy!
 SERVERNAME = "GridWars.run"
 
+######################################################################
+# World + Character wiring (Epic 3 W2 + Epic 4 C2)
+######################################################################
+
+# Point new-character spawn at Users' Sector (built by world.build_grid).
+# START_LOCATION must be a dbref string — Evennia passes it directly to
+# ObjectDB.objects.get_id(), which does not accept a callable.
+# After running `evennia batchcode world.build_grid` for the first time,
+# confirm the Users' Sector dbref with:
+#   evennia shell -c "from evennia.utils.search import search_tag; r=search_tag('users_sector', category='world_build'); print(r[0].dbref if r else 'not found')"
+# then update this value if it differs from the default #2.
+START_LOCATION = "#2"
+
+# Use the GridWars Character subclass for every new character.
+# Path is relative to the gridwars/ game dir per Evennia convention.
+BASE_CHARACTER_TYPECLASS = "typeclasses.characters.Character"
 
 ######################################################################
 # Settings given in secret_settings.py override those in this file.
