@@ -38,8 +38,9 @@ Connect to the official GridWars.run server:
 
 - **Telnet:** `telnet gridwars.run 4000`
 - **Web client:** <https://gridwars.run>
+- **MUD client:** any modern client works — Mudlet, TinTin++, MUSHclient, or your terminal's built-in telnet
 
-> **Public server status: pre-launch.** The hosted server at gridwars.run is not yet deployed. Once it is live, you will be able to connect without installing anything.
+> **Public server status: pre-launch.** The hosted server at gridwars.run is not yet deployed. Once it is live, you will be able to connect without installing anything. GridWars.run is an online-only service — there is no self-hosted edition.
 
 ### First playable commands
 
@@ -247,7 +248,9 @@ Full contributor guide: [`CONTRIBUTING.md`](CONTRIBUTING.md). AI agent guidance:
 
 ## Development
 
-Want to contribute? Run a local server to test your changes:
+> If you want to **play**, see [Play](#play). The setup below is for **contributing** — running a local copy to test changes before opening a PR.
+
+Want to contribute? Run a local dev server to test your changes:
 
 ```bash
 git clone --recurse-submodules https://github.com/jsgerman-oss/gridwars.run.git

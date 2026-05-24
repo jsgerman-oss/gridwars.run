@@ -1,5 +1,7 @@
 # Hosting — Cloudflare Pages
 
+> This document covers deployment of the gridwars.run **marketing landing page** to Cloudflare Pages. It is NOT a guide for hosting your own GridWars server — that is intentionally unsupported.
+
 GridWars.run's landing site deploys automatically to [Cloudflare Pages](https://pages.cloudflare.com/) on every push to `main` that touches `landing/**`.
 
 ---

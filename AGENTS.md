@@ -56,13 +56,15 @@ Critical rules:
 - `docs/` — operational docs: `SETUP.md` (run procedure), `CONVENTIONS.md` (SPDX header rule).
 - `.github/workflows/test.yml` — CI; runs `make test` on push + PR.
 
-### Run the game
+### Run a dev server (contributors only)
+
+> Players don't need this — connect to gridwars.run instead. The make targets below are for **contributors** running a local copy to test changes before opening a PR.
 
 ```bash
 make install            # one-time venv + Evennia install
 make migrate            # one-time DB init (non-interactive)
 make createsuperuser    # interactive — creates your in-game #1 character
-make run                # boot server (telnet 4000, web 4001)
+make run                # boot server (telnet localhost 4000, web localhost 4001)
 make stop
 make test               # Evennia test harness
 ```
