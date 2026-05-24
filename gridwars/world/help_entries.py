@@ -26,6 +26,44 @@ Each dict is on the form
 
 HELP_ENTRY_DICTS = [
     {
+        "key": "gridwars",
+        "aliases": ["gw"],
+        "category": "GridWars",
+        "text": """
+|cWelcome to GridWars.run.|n
+
+Full PvP. No limits. Free to play. Open source.
+
+|wInfo commands|n
+  |gstatus|n            Identity disc HUD (integrity, energy, exp, rank)
+  |gscan|n              Tactical sector view (programs + exits + flavor)
+  |ghelp <command>|n    Command-specific help (any command in this index)
+
+|wFaction commands|n (|cUsers|n / |gPrograms|n / |rDaemons|n)
+  |gfaction|n                List factions + your current alignment
+  |gfaction choose <name>|n  Align (one-shot; admin override required to change)
+
+|wCombat commands|n
+  |gstrike <target>|n  Same-sector PvP strike; defeat sends target back to
+                       Users' Sector with restored integrity. Attackers
+                       gain experience on victory. Characters are never
+                       deleted.
+
+|wMovement|n
+  |gnorth|n / |gsouth|n / |geast|n / |gwest|n   Move via named exits (aliased n/s/e/w)
+  |glook|n                          Re-render the current sector
+
+|wSocial|n (stock Evennia)
+  |gsay <text>|n      Speak in the current sector
+  |gpose <action>|n   Emote
+  |gwho|n             List connected players
+  |gquit|n            Disconnect
+
+|c→ Start by choosing a faction (|wfaction choose Users|n |cor any other), then
+scan the Combat Grid (|wnorth, east, north|n |cfrom Users' Sector).|n
+        """,
+    },
+    {
         "key": "evennia",
         "aliases": ["ev"],
         "category": "General",
