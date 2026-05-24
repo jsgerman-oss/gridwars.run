@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GridWars.run — a cyber-grid persistent MUD. Full PvP. No limits. Free to play. Open source." />
+  <meta property="og:title" content="GridWars.run" />
+  <meta property="og:description" content="Full PvP. No limits. Free to play. Open source." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://gridwars.run" />
+  <meta property="og:image" content="https://gridwars.run/assets/gridwars-banner.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#00e5ff" />
+
+  <title>GridWars.run — Enter the Grid</title>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+
+  <!-- Subtle scanlines for CRT ambiance -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ── Topbar ── -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <a href="/" class="site-wordmark" aria-label="GridWars.run — home">GRIDWARS.RUN</a>
+      <nav class="topbar-nav" aria-label="Site navigation">
+        <a href="#connect">Connect</a>
+        <a href="#factions">Factions</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="https://github.com/jsgerman-oss/gridwars.run" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <span class="status-pill" role="status" aria-label="Server status: pre-launch">PRE-LAUNCH</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ── Hero ── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <img
+        src="/assets/gridwars-banner.png"
+        alt="GridWars.run — neon grid banner"
+        class="hero-banner"
+        width="640"
+        height="auto"
+        loading="eager"
+      />
+      <p class="hero-tagline" id="hero-title" aria-label="Tagline">
+        Full PvP. No limits. Free to play. Open source.
+      </p>
+      <p class="hero-pitch">
+        GridWars.run is a persistent cyber-grid MUD where programs, daemons, and rogue users clash across contested sectors. Claim territory, issue challenges, run black-ice routines, and carve your identity into the Grid — no deletion, no safe rooms, no pay-to-win.
+      </p>
+      <div class="hero-ctas" role="group" aria-label="Primary actions">
+        <a href="#connect" class="btn btn-primary">
+          <span aria-hidden="true">&#x25B6;</span> Enter the Grid
+        </a>
+        <a
+          href="https://github.com/jsgerman-oss/gridwars.run"
+          class="btn btn-secondary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span aria-hidden="true">&#10022;</span> View on GitHub
+        </a>
+        <a href="https://github.com/jsgerman-oss/gridwars.run/blob/main/docs/SETUP.md" class="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+          Run locally
+        </a>
+      </div>
+    </section>
+
+    <!-- ── Connect / How to Play ── -->
+    <section id="connect" class="connect-section" aria-labelledby="connect-title">
+      <div class="container">
+        <p class="section-label">Access the Grid</p>
+        <h2 class="section-title" id="connect-title">How to Connect</h2>
+        <p class="section-body">
+          The production server goes live soon. Play locally right now by cloning the repo and running the Evennia stack — full setup in under five minutes.
+        </p>
+
+        <div class="connect-grid" role="list">
+          <!-- Telnet -->
+          <div class="connect-card" role="listitem" aria-labelledby="telnet-title">
+            <p class="connect-card-label">Terminal / MUD client</p>
+            <h3 class="connect-card-title" id="telnet-title">
+              Telnet
+              <span class="coming-soon-badge" aria-label="Coming soon">soon</span>
+            </h3>
+            <p
+              class="connect-cmd"
+              title="Copy command"
+              role="textbox"
+              aria-label="Telnet connection command"
+              tabindex="0"
+            >telnet gridwars.run 4000</p>
+            <p class="connect-note">Works with any MUD client (Mudlet, Tintin++, telnet).</p>
+          </div>
+
+          <!-- Web client -->
+          <div class="connect-card" role="listitem" aria-labelledby="webclient-title">
+            <p class="connect-card-label">Browser</p>
+            <h3 class="connect-card-title" id="webclient-title">
+              Web client
+              <span class="coming-soon-badge" aria-label="Coming soon">soon</span>
+            </h3>
+            <p
+              class="connect-cmd"
+              role="textbox"
+              aria-label="Web client URL"
+              tabindex="0"
+            >https://gridwars.run/play</p>
+            <p class="connect-note">Evennia built-in webclient — no install required.</p>
+          </div>
+
+          <!-- Run locally -->
+          <div class="connect-card" role="listitem" aria-labelledby="local-title">
+            <p class="connect-card-label">Self-hosted</p>
+            <h3 class="connect-card-title" id="local-title">Run locally — play now</h3>
+            <p
+              class="connect-cmd"
+              role="textbox"
+              aria-label="Git clone command"
+              tabindex="0"
+            >git clone github.com/jsgerman-oss/gridwars.run</p>
+            <p class="connect-note">
+              <a href="https://github.com/jsgerman-oss/gridwars.run/blob/main/docs/SETUP.md" target="_blank" rel="noopener noreferrer">Full setup guide</a> — Python + Evennia stack, no containers required.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Factions ── -->
+    <section id="factions" aria-labelledby="factions-title">
+      <div class="container">
+        <p class="section-label">Allegiance</p>
+        <h2 class="section-title" id="factions-title">Choose a Faction</h2>
+        <p class="section-body">
+          Every entity in GridWars declares allegiance. Factions shape your combat style, your access to sectors, and how the Grid perceives you.
+        </p>
+        <div class="factions-grid" role="list">
+          <article class="faction-card users" role="listitem" aria-labelledby="faction-users">
+            <span class="faction-sigil" aria-hidden="true">&#9651;</span>
+            <h3 class="faction-name" id="faction-users">Users</h3>
+            <p class="faction-desc">Operators from outside the Grid. Raw executive access, high heat signatures. Claim sector roots and issue system-level orders — if you can survive long enough.</p>
+          </article>
+          <article class="faction-card programs" role="listitem" aria-labelledby="faction-programs">
+            <span class="faction-sigil" aria-hidden="true">&#x25C6;</span>
+            <h3 class="faction-name" id="faction-programs">Programs</h3>
+            <p class="faction-desc">Born of the Grid. Precise, lethal, loyal to function. Programs execute without hesitation — speed and efficiency over raw power.</p>
+          </article>
+          <article class="faction-card daemons" role="listitem" aria-labelledby="faction-daemons">
+            <span class="faction-sigil" aria-hidden="true">&#x2736;</span>
+            <h3 class="faction-name" id="faction-daemons">Daemons</h3>
+            <p class="faction-desc">Autonomous. Unaligned. Dangerous. Daemons run persistent patrol routines, hold sector chokepoints, and don't negotiate.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Roadmap ── -->
+    <section id="roadmap" aria-labelledby="roadmap-title">
+      <div class="container">
+        <p class="section-label">System Queue</p>
+        <h2 class="section-title" id="roadmap-title">Roadmap</h2>
+        <p class="section-body">
+          The Grid is still compiling. These cycles are locked in — follow the repo for status.
+        </p>
+        <ul class="roadmap-list" role="list">
+          <li class="roadmap-item">
+            <span class="roadmap-item-icon" aria-hidden="true">&#x2023;</span>
+            <div>
+              <p class="roadmap-item-title">Lightcycle duels</p>
+              <p class="roadmap-item-desc">Real-time 1v1 arena combat with timed challenge-accept windows.</p>
+            </div>
+          </li>
+          <li class="roadmap-item">
+            <span class="roadmap-item-icon" aria-hidden="true">&#x2023;</span>
+            <div>
+              <p class="roadmap-item-title">Daemon AI patrols</p>
+              <p class="roadmap-item-desc">Persistent NPCs that hold chokepoints, escalate on intrusion, and remember offenders.</p>
+            </div>
+          </li>
+          <li class="roadmap-item">
+            <span class="roadmap-item-icon" aria-hidden="true">&#x2023;</span>
+            <div>
+              <p class="roadmap-item-title">Sector ownership</p>
+              <p class="roadmap-item-desc">Factions capture and hold grid sectors for passive resource yield and tactical control.</p>
+            </div>
+          </li>
+          <li class="roadmap-item">
+            <span class="roadmap-item-icon" aria-hidden="true">&#x2023;</span>
+            <div>
+              <p class="roadmap-item-title">Identity discs</p>
+              <p class="roadmap-item-desc">Unique program artifacts carrying kill records, stolen sectors, and rep history.</p>
+            </div>
+          </li>
+          <li class="roadmap-item">
+            <span class="roadmap-item-icon" aria-hidden="true">&#x2023;</span>
+            <div>
+              <p class="roadmap-item-title">Black-ice routines</p>
+              <p class="roadmap-item-desc">Automated intrusion countermeasures deployable by sector owners.</p>
+            </div>
+          </li>
+          <li class="roadmap-item">
+            <span class="roadmap-item-icon" aria-hidden="true">&#x2023;</span>
+            <div>
+              <p class="roadmap-item-title">Production server</p>
+              <p class="roadmap-item-desc">gridwars.run :4000 — live, persistent, always-on Grid.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── GitHub CTA ── -->
+    <section class="github-section" aria-labelledby="github-cta-title">
+      <div class="container">
+        <p class="section-label">Open Source</p>
+        <h2 class="section-title" id="github-cta-title">Built in public. Fork the Grid.</h2>
+        <div class="github-banner">
+          <div class="github-banner-text">
+            <h3>jsgerman-oss/gridwars.run</h3>
+            <p>Python + Evennia. AGPL-3.0. Contributions welcome — file an issue, open a PR, or fork your own sector of the Grid.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.625rem;flex-shrink:0;">
+            <a
+              href="https://github.com/jsgerman-oss/gridwars.run"
+              class="btn btn-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View gridwars.run on GitHub"
+            >
+              <span aria-hidden="true">&#10022;</span> Star on GitHub
+            </a>
+            <a
+              href="https://github.com/jsgerman-oss/gridwars.run/issues"
+              class="btn btn-ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open an issue
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="footer-wordmark">GRIDWARS.RUN</span>
+          <span class="footer-meta">
+            &copy; 2026 Jay German &mdash;
+            <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">AGPL-3.0-or-later</a>
+          </span>
+          <span class="footer-meta">
+            Powered by <a href="https://www.evennia.com" target="_blank" rel="noopener noreferrer">Evennia</a>
+          </span>
+        </div>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="https://github.com/jsgerman-oss/gridwars.run" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://github.com/jsgerman-oss/gridwars.run/blob/main/docs/SETUP.md" target="_blank" rel="noopener noreferrer">Setup</a>
+          <a href="https://github.com/jsgerman-oss/gridwars.run/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contribute</a>
+          <a href="https://github.com/jsgerman-oss/gridwars.run/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a>
+          <a href="https://github.com/jsgerman-oss/gridwars.run/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">Security</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Copy-to-clipboard for .connect-cmd elements
+    document.querySelectorAll('.connect-cmd').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var text = el.textContent.trim();
+        navigator.clipboard.writeText(text).then(function() {
+          var orig = el.style.color;
+          el.style.color = '#fff';
+          setTimeout(function() { el.style.color = orig; }, 600);
+        }).catch(function() {
+          // Clipboard API unavailable — silent fallback
+        });
+      });
+      el.setAttribute('title', 'Click to copy');
+      el.style.cursor = 'pointer';
+    });
+  </script>
+</body>
+</html>
