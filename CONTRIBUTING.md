@@ -1,5 +1,7 @@
 # Contributing to GridWars.run
 
+GridWars.run is an online-only service hosted at gridwars.run. This project welcomes contributions to the **codebase**; we don't support or document self-hosted deployments.
+
 GridWars.run is open source under AGPL-3.0-or-later. Issues, PRs, and design discussion are all welcome.
 
 ## Filing an issue

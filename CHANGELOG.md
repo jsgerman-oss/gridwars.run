@@ -26,7 +26,7 @@ All notable changes to GridWars.run are documented here. The format follows [Kee
 - Brand assets: `gridwars-banner.svg`, logo + favicon
 
 ### Notes
-- Public server at gridwars.run is not yet deployed; players connect locally for now.
+- Public server at gridwars.run is not yet deployed; GridWars.run is online-only once live — no self-hosted edition.
 - 4 v0.2 epics filed in bd: Sector Ownership, Identity Discs, Daemon AI, Lightcycle Duels.
 
 [v0.1.0]: https://github.com/jsgerman-oss/gridwars.run/releases/tag/v0.1.0

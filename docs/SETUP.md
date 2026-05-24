@@ -37,7 +37,9 @@ git submodule update --init --recursive
 Python **3.12 or later** is required. Bootstrapping the game server and
 installing Evennia is covered in the next section.
 
-## Running GridWars.run locally
+## Running a dev server (contributors only)
+
+> GridWars.run is an online-only service hosted at gridwars.run. The instructions below are for **contributors** running a local dev server to test changes. **Players don't need to do any of this** — just connect via telnet or the web client at gridwars.run once the server is live.
 
 GridWars.run runs on Evennia v6.0.0 (Python 3.12+). After cloning the repo (see "Cloning" above):
 
