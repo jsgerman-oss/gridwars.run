@@ -78,7 +78,7 @@ After `make install` and `make migrate`, populate the world with the five GridWa
 ```bash
 cd gridwars && ../.venv/bin/python -c "import os, django; \
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \
-  django.setup(); from world import build_grid"
+  django.setup(); from world import build_grid; build_grid.build()"
 ```
 
 The script is idempotent — re-running it does NOT duplicate rooms (each is tagged `("gridwars-core", "world_build")` and reused if present). Fresh characters spawn in **Users' Sector** automatically via a tag-based `Account.create_character()` hook (gridwars/typeclasses/accounts.py).
