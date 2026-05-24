@@ -119,3 +119,39 @@ class Character(ObjectParent, DefaultCharacter):
             min_integrity (int): Floor to apply to integrity. Defaults to 25.
         """
         self.integrity = max(min_integrity, self.integrity)
+
+    # ------------------------------------------------------------------
+    # Login / logout hooks — Epic 8 Th2
+    # Hook names verified against vendor/evennia/evennia/objects/objects.py
+    # (DefaultObject lines 2131, 2148): at_post_puppet(**kwargs),
+    # at_pre_unpuppet(**kwargs).
+    # ------------------------------------------------------------------
+
+    def at_post_puppet(self, **kwargs):
+        """
+        Called after the Account puppets this Character.
+
+        Sends the themed LOGIN message. If the Character has no faction,
+        also sends the FACTION_NUDGE directing them to the faction command.
+        Nudge fires once per puppet event (i.e. each login session); Epic 5
+        will gate stricter "once per lifetime" semantics when the faction
+        system lands.
+        """
+        super().at_post_puppet(**kwargs)
+        from world.messages import FACTION_NUDGE, LOGIN, render
+
+        self.msg(render(LOGIN, name=self.key))
+        if not self.faction:
+            self.msg(render(FACTION_NUDGE))
+
+    def at_pre_unpuppet(self, **kwargs):
+        """
+        Called before the Account un-puppets this Character.
+
+        Sends the themed LOGOUT message before the session link is dropped
+        so the client sees it while still connected.
+        """
+        from world.messages import LOGOUT, render
+
+        self.msg(render(LOGOUT))
+        super().at_pre_unpuppet(**kwargs)
