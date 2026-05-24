@@ -82,6 +82,13 @@ class CmdStrike(Command):
         if target.integrity == 0:
             self._defeat(caller, target)
 
+        # In-arena duel scoring — runs AFTER defeat flow so target may have
+        # already been moved out by respawn; end_arena handles that gracefully.
+        loc = caller.location
+        if loc and loc.is_typeclass("typeclasses.duel_arenas.DuelArena", exact=False):
+            from world.duels_score import handle_duel_strike
+            handle_duel_strike(arena=loc, attacker=caller, target=target)
+
     def _defeat(self, attacker, target):
         # Room broadcast
         if target.location:
