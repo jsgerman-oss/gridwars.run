@@ -42,18 +42,22 @@ SERVERNAME = "GridWars.run"
 # World + Character wiring (Epic 3 W2 + Epic 4 C2)
 ######################################################################
 
-# Point new-character spawn at Users' Sector (built by world.build_grid).
-# START_LOCATION must be a dbref string — Evennia passes it directly to
-# ObjectDB.objects.get_id(), which does not accept a callable.
-# After running `evennia batchcode world.build_grid` for the first time,
-# confirm the Users' Sector dbref with:
-#   evennia shell -c "from evennia.utils.search import search_tag; r=search_tag('users_sector', category='world_build'); print(r[0].dbref if r else 'not found')"
-# then update this value if it differs from the default #2.
-START_LOCATION = "#2"
+# Use the GridWars Account subclass.  Its create_character() override
+# resolves spawn location via tag lookup ("users_sector", "world_build")
+# at runtime, making START_LOCATION below a true last-resort fallback only.
+BASE_ACCOUNT_TYPECLASS = "typeclasses.accounts.Account"
 
 # Use the GridWars Character subclass for every new character.
 # Path is relative to the gridwars/ game dir per Evennia convention.
 BASE_CHARACTER_TYPECLASS = "typeclasses.characters.Character"
+
+# Fallback spawn location used only when tag lookup finds no Users' Sector
+# (e.g. first boot before `evennia batchcode world.build_grid` has run).
+# Evennia's DefaultAccount.create_character() passes this to
+# ObjectDB.objects.get_id(), which requires a dbref string — not a callable.
+# Limbo (#2) is the safe default; characters will move to Users' Sector on
+# the next grid build + reconnect.
+START_LOCATION = "#2"
 
 ######################################################################
 # Settings given in secret_settings.py override those in this file.
