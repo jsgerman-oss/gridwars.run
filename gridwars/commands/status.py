@@ -7,6 +7,7 @@ the registry (Epic 5).
 """
 from commands.command import Command
 from world.factions import get as get_faction
+from world.ownership import rooms_owned_by
 
 
 def _bar_color(value: int, ceiling: int = 100) -> str:
@@ -66,4 +67,7 @@ class CmdStatus(Command):
             f"|w  Rank     |n |c{grid_rank}|n",
             "|c╚════════════════════════════════════╝|n",
         ]
+        if faction_name:
+            held_count = len(rooms_owned_by(faction_name))
+            lines.append(f"|w  Sectors  |n |g{held_count}|n held by your faction")
         c.msg("\n".join(lines))

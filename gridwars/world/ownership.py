@@ -16,7 +16,7 @@ and display integration (SO3) build on these helpers.
 """
 from evennia.utils.search import search_tag
 
-from gridwars.world import factions as _factions
+from world import factions as _factions
 
 OWNERSHIP_CATEGORY = "ownership"
 OWNERSHIP_TAG_PREFIX = "owned-by:"

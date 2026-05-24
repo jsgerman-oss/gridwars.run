@@ -8,6 +8,7 @@ of `db.desc`).
 """
 from evennia import Command
 from world.factions import get as get_faction
+from world.ownership import get_owner
 
 
 def _faction_color(name: str | None) -> str:
@@ -89,5 +90,14 @@ class CmdScan(Command):
             out.append("|wExits:|n " + ", ".join(f"|c{e.key}|n" for e in exits))
         else:
             out.append("|wExits:|n (none)")
+
+        # Sector control
+        owner = get_owner(loc)
+        if owner:
+            spec = get_faction(owner)
+            color = spec["color"] if spec else "|w"
+            out.append(f"|wSector control:|n {color}{owner}|n")
+        else:
+            out.append("|wSector control:|n |yunclaimed|n")
 
         c.msg("\n".join(out))
