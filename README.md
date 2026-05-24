@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="gridwars-banner.svg" alt="GridWars.run" width="800" />
+<img src="gridwars-banner.png" alt="GridWars.run" width="800" />
 
 ### Open-source PvP MUD on the Grid — full PvP, no deletion, no pay-to-win
 
