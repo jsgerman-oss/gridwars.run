@@ -35,5 +35,38 @@ git submodule update --init --recursive
 ## Python version requirement
 
 Python **3.12 or later** is required. Bootstrapping the game server and
-installing Evennia is covered in Epic 2 (not yet written). Do not install
-anything based on this file alone; this document covers only the clone step.
+installing Evennia is covered in the next section.
+
+## Running GridWars.run locally
+
+GridWars.run runs on Evennia v6.0.0 (Python 3.12+). After cloning the repo (see "Cloning" above):
+
+```bash
+make install     # creates .venv/, installs vendored Evennia (one-time + on dep updates)
+make migrate     # initialise the SQLite DB (one-time; will prompt for superuser)
+make run         # start the server
+```
+
+Connect:
+- Telnet: `telnet localhost 4000`
+- Webclient: open <http://localhost:4001> in any browser
+
+Stop with `make stop`. Run the Evennia test harness with `make test`.
+
+### Updating after a `git pull`
+
+```bash
+git submodule update --init --recursive   # sync vendored Evennia to the new pin
+make install                              # re-resolves pip deps if Evennia bumped
+make migrate                              # apply any new Django/Evennia migrations
+```
+
+### First-run superuser
+
+`make migrate` applies all database migrations non-interactively. After migrating, run:
+
+```bash
+make createsuperuser
+```
+
+This account is the in-game `#1` character and the web-admin admin. Use a throwaway password for local dev.
