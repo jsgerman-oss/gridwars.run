@@ -322,6 +322,66 @@ section {
   line-height: 1.8;
 }
 
+/* ── How to Play ── */
+.how-to-play-section {
+  background: linear-gradient(180deg, transparent, rgba(255, 45, 120, 0.03) 50%, transparent);
+}
+
+.how-to-play-steps {
+  list-style: none;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.htp-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-left: 3px solid var(--cyan);
+  border-radius: var(--radius);
+  padding: 1.125rem 1.5rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.htp-step:hover {
+  border-left-color: var(--magenta);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.05);
+}
+
+.htp-step-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--cyan-dim);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  min-width: 1.75rem;
+}
+
+.htp-step-title {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.htp-step-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.htp-step-desc code {
+  color: var(--cyan-dim);
+}
+
+.htp-cta {
+  margin-top: 2rem;
+}
+
 /* ── Connect block ── */
 .connect-section {
   background: linear-gradient(180deg, transparent, rgba(0, 229, 255, 0.03) 50%, transparent);
