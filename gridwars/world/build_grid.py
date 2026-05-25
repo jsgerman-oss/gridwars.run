@@ -87,6 +87,28 @@ SECTORS = {
             "This place was built for one purpose: to determine which programs persist."
         ),
     },
+    "uplink_node": {
+        "key": "Uplink Node",
+        "desc": (
+            "Awareness arrives in pulses. "
+            "The first thing a new program perceives is the Grid clock -- "
+            "a deep subsonic tick that measures existence in discrete cycles, "
+            "steady and merciless as a heartbeat carved from pure logic. "
+            "The Uplink Node is a featureless antechamber of luminous white panels "
+            "divided by hairline seams of electric blue, every surface humming "
+            "at a frequency just below the threshold of comprehension. "
+            "A terminal hum permeates the space, rising and falling with the load "
+            "of programs initializing nearby -- you are not alone in this awakening. "
+            "Slender columns of encoded light descend from the vaulted ceiling "
+            "like rainfall captured mid-fall, each column a stream of identity "
+            "data cascading into newly spawned forms. "
+            "Your own code resolves last: integrity intact, disc seated, "
+            "faction tag still writing itself to your registers. "
+            "Somewhere beyond the glowing seam at the far wall, "
+            "the pulse of Users' Sector is already audible -- "
+            "a wider, louder world waiting for you to jack in."
+        ),
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -102,6 +124,8 @@ EXITS = [
     ("archive_node",        "users_sector",          "west",  ["w"]),
     ("daemon_gate",         "combat_grid",           "north", ["n"]),
     ("combat_grid",         "daemon_gate",           "south", ["s"]),
+    ("uplink_node",         "users_sector",          "jack-in", ["ji"]),
+    ("users_sector",        "uplink_node",           "return",  []),
 ]
 
 
