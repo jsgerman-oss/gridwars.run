@@ -45,7 +45,7 @@ Full PvP. No limits. Free to play. Open source.
 
 |wCombat commands|n
   |gstrike <target>|n  Same-sector PvP strike; defeat sends target back to
-                       Users' Sector with restored integrity. Attackers
+                       Users\' Sector with restored integrity. Attackers
                        gain experience on victory. Characters are never
                        deleted.
 
@@ -60,7 +60,7 @@ Full PvP. No limits. Free to play. Open source.
   |gquit|n            Disconnect
 
 |c→ Start by choosing a faction (|wfaction choose Users|n |cor any other), then
-scan the Combat Grid (|wnorth, east, north|n |cfrom Users' Sector).|n
+scan the Combat Grid (|wnorth, east, north|n |cfrom Users\' Sector).|n
         """,
     },
     {
@@ -92,5 +92,179 @@ scan the Combat Grid (|wnorth, east, north|n |cfrom Users' Sector).|n
             following link: https://discord.gg/AJJpcRUhtF
 
         """,
+    },
+    # ---------------------------------------------------------------------------
+    # Per-command stub entries - prose fill comes in e18.2
+    # ---------------------------------------------------------------------------
+    {
+        "key": "status",
+        "category": "GridWars",
+        "text": """
+|cstatus|n - Identity disc HUD: integrity, energy, experience, rank.
+
+|wUsage:|n |gstatus|n
+
+|wSee also:|n scan, strike, equip.
+""",
+    },
+    {
+        "key": "scan",
+        "category": "GridWars",
+        "text": """
+|cscan|n - Tactical sector view: programs present, exits, and ambient flavor.
+
+|wUsage:|n |gscan|n
+
+|wSee also:|n status, look, strike.
+""",
+    },
+    {
+        "key": "strike",
+        "category": "GridWars",
+        "text": """
+|cstrike|n - Launch a PvP attack against a target in your current sector.
+
+|wUsage:|n |gstrike <target>|n
+
+|wSee also:|n status, scan, challenge.
+""",
+    },
+    {
+        "key": "challenge",
+        "category": "GridWars",
+        "text": """
+|cchallenge|n - Issue a formal duel challenge to another player.
+
+|wUsage:|n |gchallenge <target>|n
+
+|wSee also:|n accept, decline, strike.
+""",
+    },
+    {
+        "key": "accept",
+        "category": "GridWars",
+        "text": """
+|caccept|n - Accept a pending duel challenge from another player.
+
+|wUsage:|n |gaccept <challenger>|n
+
+|wSee also:|n challenge, decline.
+""",
+    },
+    {
+        "key": "decline",
+        "category": "GridWars",
+        "text": """
+|cdecline|n - Decline a pending duel challenge.
+
+|wUsage:|n |gdecline <challenger>|n
+
+|wSee also:|n challenge, accept.
+""",
+    },
+    {
+        "key": "equip",
+        "category": "GridWars",
+        "text": """
+|cequip|n - Equip a disc or weapon from your inventory.
+
+|wUsage:|n |gequip <item>|n
+
+|wSee also:|n unequip, inventory, status.
+""",
+    },
+    {
+        "key": "unequip",
+        "category": "GridWars",
+        "text": """
+|cunequip|n - Remove an equipped disc or weapon and return it to inventory.
+
+|wUsage:|n |gunequip <item>|n
+
+|wSee also:|n equip, inventory, status.
+""",
+    },
+    {
+        "key": "inventory",
+        "category": "GridWars",
+        "text": """
+|cinventory|n - List all items you are carrying (equipped and unequipped).
+
+|wUsage:|n |ginventory|n
+
+|wSee also:|n equip, unequip, status.
+""",
+    },
+    {
+        "key": "faction",
+        "category": "GridWars",
+        "text": """
+|cfaction|n - List factions and check or set your alignment.
+
+|wUsage:|n |gfaction|n or |gfaction choose <name>|n
+
+|wSee also:|n status, gridwars.
+""",
+    },
+    {
+        "key": "north",
+        "category": "General",
+        "aliases": ["n"],
+        "text": "|cnorth|n - Move through the north exit of the current sector. Alias: |gn|n.",
+    },
+    {
+        "key": "south",
+        "category": "General",
+        "aliases": ["s"],
+        "text": "|csouth|n - Move through the south exit of the current sector. Alias: |gs|n.",
+    },
+    {
+        "key": "east",
+        "category": "General",
+        "aliases": ["e"],
+        "text": "|ceast|n - Move through the east exit of the current sector. Alias: |ge|n.",
+    },
+    {
+        "key": "west",
+        "category": "General",
+        "aliases": ["w"],
+        "text": "|cwest|n - Move through the west exit of the current sector. Alias: |gw|n.",
+    },
+    {
+        "key": "look",
+        "category": "General",
+        "aliases": ["l"],
+        "text": "|clook|n - Re-render the current sector description. Alias: |gl|n.",
+    },
+    {
+        "key": "say",
+        "category": "General",
+        "text": "|csay|n - Speak aloud in the current sector. Usage: |gsay <text>|n",
+    },
+    {
+        "key": "pose",
+        "category": "General",
+        "text": "|cpose|n - Emote an action in the current sector. Usage: |gpose <action>|n",
+    },
+    {
+        "key": "who",
+        "category": "General",
+        "text": "|cwho|n - List all currently connected players.",
+    },
+    {
+        "key": "quit",
+        "category": "General",
+        "text": "|cquit|n - Disconnect from GridWars.",
+    },
+    {
+        "key": "help",
+        "category": "General",
+        "text": """
+|chelp|n - Display help for a command or topic.
+
+|wUsage:|n |ghelp|n or |ghelp <topic>|n
+
+|wSee also:|n gridwars.
+""",
     },
 ]
