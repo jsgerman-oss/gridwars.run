@@ -93,3 +93,210 @@ The `landing/_redirects` file ensures `www.gridwars.run/*` always redirects to `
 | Production (custom domain, once Step 4 done) | `https://gridwars.run/` |
 | Cloudflare account | Audit Identity — ID `4bf8ccaf39f18a8a46b21a317e2d3a1b` |
 | GitHub repo | `https://github.com/jsgerman-oss/gridwars.run` |
+
+---
+
+## Gameplay-Loop Operations
+
+This section covers day-to-day operational tasks for the Evennia game server. All shell snippets run via `evennia shell` (Django shell with the full game ORM loaded) unless noted otherwise.
+
+---
+
+### Queue monitoring
+
+The duel queue is stored in `ServerConfig` under the key `gw_duel_queue`. To inspect its current state:
+
+```python
+from evennia.server.models import ServerConfig
+from evennia.objects.models import ObjectDB
+
+queue = list(ServerConfig.objects.conf("gw_duel_queue", default=list) or [])
+print(f"Queue depth: {len(queue)}")
+for cid in queue:
+    try:
+        char = ObjectDB.objects.get(id=cid)
+        print(f"  #{cid} — {char.key}")
+    except ObjectDB.DoesNotExist:
+        print(f"  #{cid} — (object missing, stale entry)")
+```
+
+A stale entry (object missing) can accumulate if a character is deleted while queued. To remove it, call `clear_queue()` or manually rebuild the list without the bad ID:
+
+```python
+from world.queue_store import clear_queue
+clear_queue()   # wipes the queue entirely — use with care during off-peak hours
+```
+
+**Note:** Queue state is lost on a backup restore because it lives in `ServerConfig` (Django ORM), not in a separate file. After a restore, verify the queue is empty and have waiting players re-queue. See [Backup/restore considerations](#backuprestore-considerations) below.
+
+---
+
+### Matchmaking script status
+
+The `MatchmakingScript` is a persistent Evennia script that polls the queue every 5 seconds. It auto-starts via `at_server_startstop.at_server_start()` on every `evennia reload` or cold boot.
+
+To verify it is running:
+
+```python
+from evennia.utils.search import search_script
+scripts = search_script("matchmaking")
+for s in scripts:
+    print(f"key={s.key}  running={s.is_valid()}  interval={s.interval}s  next_repeat={s.time_until_next_repeat():.1f}s")
+```
+
+If the script is absent (empty result), restart it manually:
+
+```python
+from evennia.utils.create import create_script
+from world.matchmaking import MatchmakingScript
+create_script(MatchmakingScript)
+```
+
+The script is `persistent=True`, so a normal `evennia reload` is sufficient for it to survive restarts without manual intervention. If you see two `matchmaking` scripts after a reload anomaly, delete the duplicate:
+
+```python
+scripts = search_script("matchmaking")
+# Keep the most recently created one; delete the rest.
+for s in scripts[1:]:
+    s.delete()
+```
+
+---
+
+### Rating system
+
+Player ratings are stored as the `rating` attribute on each `Character` object (default 1000, ELO K=32). For full formula details see [Rating and Leaderboard](PLAYER.md#rating-and-leaderboard).
+
+**Inspect a player's current rating:**
+
+```python
+from evennia.utils.search import search_object
+chars = search_object("PlayerName", typeclass="typeclasses.characters.Character")
+char = chars[0]
+print(f"{char.key}: rating={char.rating}")
+```
+
+**Manually adjust a rating:**
+
+```python
+char.rating = 1200   # set to any non-negative integer
+```
+
+**Reset to default (1000):**
+
+```python
+char.rating = 1000
+```
+
+**Export the leaderboard to CSV (stdout):**
+
+```python
+from evennia.objects.models import ObjectDB
+import csv, sys
+
+chars = ObjectDB.objects.filter(
+    db_typeclass_path="typeclasses.characters.Character"
+).order_by("-db_attributes__db_value")
+
+# Fetch and sort in Python (AttributeProperty values are not SQL-sortable directly).
+ranked = sorted(
+    [(obj.db_key, getattr(obj, "rating", 1000)) for obj in chars],
+    key=lambda x: x[1],
+    reverse=True,
+)
+
+writer = csv.writer(sys.stdout)
+writer.writerow(["rank", "name", "rating"])
+for i, (name, rating) in enumerate(ranked, 1):
+    writer.writerow([i, name, rating])
+```
+
+---
+
+### Disc XP
+
+Disc XP is stored on the `Disc` object (not directly on the character). Each character's equipped disc is tracked via `char.db.equipped_disc`.
+
+**Inspect a player's disc level and XP:**
+
+```python
+from evennia.utils.search import search_object
+chars = search_object("PlayerName", typeclass="typeclasses.characters.Character")
+char = chars[0]
+disc = char.db.equipped_disc
+if disc:
+    print(f"Disc: {disc.key}  level={disc.level}  xp={disc.xp}  damage_bonus={disc.damage_bonus}")
+else:
+    print("No disc equipped.")
+```
+
+**Grant XP to a disc manually (testing):**
+
+```python
+disc.gain_xp(100)   # triggers level-up check automatically
+```
+
+Thresholds: L2 = 100 XP, L3 = 300 XP, L4 = 700 XP, L5 = 1500 XP (totals, not increments). Level 5 is the cap; the method is safe to call past the cap.
+
+---
+
+### Backup/restore considerations
+
+| State | Location | Survives restore? |
+|-------|----------|-------------------|
+| Player ratings | `Character.db.rating` (Evennia `Attribute` table) | Yes — stored in the main Django DB |
+| Disc XP / level | `Disc.db.xp`, `Disc.db.level` | Yes — stored in the main Django DB |
+| Duel queue | `ServerConfig["gw_duel_queue"]` | Yes — stored in the main Django DB |
+| Active arenas | `DuelArena` objects in `ObjectDB` | Yes, but in an inconsistent in-flight state |
+
+**Practical implications:**
+
+- **Rating and disc state are durable.** A full DB backup and restore will preserve all player progress.
+- **Active arenas after a restore** will exist as orphaned `DuelArena` rooms (tagged `duel-arena`/`ephemeral`). Players inside them will be stranded. Clean them up with:
+
+```python
+from evennia.utils.search import search_tag
+arenas = search_tag("duel-arena", category="ephemeral")
+for arena in arenas:
+    print(f"Cleaning up: {arena.key}")
+    arena.delete()   # participants will land in their `home` location
+```
+
+- **Queue entries** technically survive a restore but point to character IDs that existed at backup time. If characters were created or deleted since the backup, stale IDs may appear. Run the [queue inspection snippet](#queue-monitoring) after any restore and clear if needed.
+
+---
+
+### Debugging duel-end issues
+
+The post-duel reward hook (`handle_duel_strike` in `world.duels_score`) fires when one player lands 3 strikes. It updates ELO ratings, awards XP, feeds disc XP, and calls `end_arena`. The module logs a structured line on every win:
+
+```
+[duel-end] <winner> (<old>→<new>) defeated <loser> (<old>→<new>)
+```
+
+**Verify the hook fired** by grepping the Evennia log:
+
+```bash
+grep "\[duel-end\]" server/logs/server.log | tail -20
+```
+
+**If an arena did not close** (both players are stuck in the room), call `end_arena` manually:
+
+```python
+from evennia.utils.search import search_tag
+from world.duels import end_arena
+
+arenas = search_tag("duel-arena", category="ephemeral")
+for arena in arenas:
+    print(f"Force-closing: {arena.key}  participants={arena.participants}")
+    end_arena(arena)   # moves participants to their origin rooms, then deletes arena
+```
+
+**If ratings were not updated** (hook fired but rating unchanged), check whether the character's `rating` attribute exists:
+
+```python
+char = ...  # fetch as above
+print(char.attributes.has("rating"), char.rating)
+```
+
+If missing, the attribute was never seeded. Set it to 1000 and the next duel will update from there.
