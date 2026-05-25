@@ -99,23 +99,23 @@ class BuildGridTestCase(EvenniaTest):
         ]
 
     # ------------------------------------------------------------------
-    # 1. 6 rooms + 10 exits created
+    # 1. 7 rooms + 12 exits created (e19.8: Grid Junction + 2 junction exits)
     # ------------------------------------------------------------------
 
-    def test_build_creates_6_rooms_and_10_exits(self):
-        """After build(), count 6 rooms and 10 exits tagged gridwars-core/world_build."""
+    def test_build_creates_7_rooms_and_12_exits(self):
+        """After build(), count 7 rooms and 12 exits tagged gridwars-core/world_build."""
         tagged = self._tagged_objects()
         rooms = self._rooms(tagged)
         exits = self._exits(tagged)
         self.assertEqual(
-            len(rooms), 6,
-            f"Expected 6 rooms, got {len(rooms)}: {[r.key for r in rooms]}\n"
+            len(rooms), 7,
+            f"Expected 7 rooms, got {len(rooms)}: {[r.key for r in rooms]}\n"
             f"All tagged ({len(tagged)}): "
             f"{[(o.key, getattr(o, 'destination', '(no dest)')) for o in tagged]}",
         )
         self.assertEqual(
-            len(exits), 10,
-            f"Expected 10 exits, got {len(exits)}: {[e.key for e in exits]}",
+            len(exits), 12,
+            f"Expected 12 exits, got {len(exits)}: {[e.key for e in exits]}",
         )
 
     # ------------------------------------------------------------------
@@ -130,12 +130,12 @@ class BuildGridTestCase(EvenniaTest):
         rooms = self._rooms(tagged)
         exits = self._exits(tagged)
         self.assertEqual(
-            len(rooms), 6,
-            f"Idempotency fail — rooms: expected 6, got {len(rooms)}",
+            len(rooms), 7,
+            f"Idempotency fail — rooms: expected 7, got {len(rooms)}",
         )
         self.assertEqual(
-            len(exits), 10,
-            f"Idempotency fail — exits: expected 10, got {len(exits)}",
+            len(exits), 12,
+            f"Idempotency fail — exits: expected 12, got {len(exits)}",
         )
 
     # ------------------------------------------------------------------
