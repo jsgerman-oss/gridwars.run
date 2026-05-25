@@ -2,7 +2,7 @@
 Tests for the e19.9 batch_cmds wiring: world.zones.batch.bootstrap().
 
 Covers:
-  1. bootstrap() builds 6 core lobby rooms and 10 lobby exits.
+  1. bootstrap() builds 7 core lobby rooms and 12 lobby exits.
   2. bootstrap() builds 42 zone variants (all 8 archetypes present).
   3. bootstrap() is idempotent — second call produces the same counts.
   4. bootstrap() return dict has all expected summary keys.
@@ -150,17 +150,22 @@ class TestBatchCmdsBootstrap(EvenniaTest):
     # ------------------------------------------------------------------
 
     def test_lobby_rooms_and_exits(self):
-        """bootstrap() builds 6 core lobby rooms and 10 lobby exits."""
+        """bootstrap() builds 7 core lobby rooms and 12 lobby exits.
+
+        Source of truth: build_grid.SECTORS (7 entries) and build_grid.EXITS
+        (12 entries).  Grid Junction was added in e19.8, bringing rooms from 6
+        to 7 and exits from 10 to 12 (daemon_gate <-> grid_junction pair).
+        """
         core = self._tagged(self.CORE_TAG)
         rooms = self._rooms(core)
         exits = self._exits(core)
         self.assertEqual(
-            len(rooms), 6,
-            f"Expected 6 lobby rooms, got {len(rooms)}: {[r.key for r in rooms]}",
+            len(rooms), 7,  # +1 Grid Junction (e19.8); source: build_grid.SECTORS
+            f"Expected 7 lobby rooms, got {len(rooms)}: {[r.key for r in rooms]}",
         )
         self.assertEqual(
-            len(exits), 10,
-            f"Expected 10 lobby exits, got {len(exits)}: {[e.key for e in exits]}",
+            len(exits), 12,  # +2 daemon_gate<->grid_junction (e19.8); source: build_grid.EXITS
+            f"Expected 12 lobby exits, got {len(exits)}: {[e.key for e in exits]}",
         )
 
     # ------------------------------------------------------------------
@@ -198,8 +203,8 @@ class TestBatchCmdsBootstrap(EvenniaTest):
 
         rooms = self._rooms(self._tagged(self.CORE_TAG))
         exits = self._exits(self._tagged(self.CORE_TAG))
-        self.assertEqual(len(rooms), 6, f"Idempotency: lobby rooms changed to {len(rooms)}")
-        self.assertEqual(len(exits), 10, f"Idempotency: lobby exits changed to {len(exits)}")
+        self.assertEqual(len(rooms), 7, f"Idempotency: lobby rooms changed to {len(rooms)}")  # +1 Grid Junction (e19.8)
+        self.assertEqual(len(exits), 12, f"Idempotency: lobby exits changed to {len(exits)}")  # +2 daemon_gate<->grid_junction (e19.8)
 
         zone_rooms = self._rooms(self._tagged(self.ZONE_TAG))
         zone_ids = {
