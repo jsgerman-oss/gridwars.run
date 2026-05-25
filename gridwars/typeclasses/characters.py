@@ -23,6 +23,8 @@ class Character(ObjectParent, DefaultCharacter):
         faction   (str|None): Player faction tag. Epic 5 validates; stored
                               here as a free-form string.
         grid_rank (str): Rank label within faction. Free-form for now.
+        rating    (int): ELO rating. Default 1000. Updated by update_rating()
+                         in world.rating after each duel (Epic 17.4+).
     """
 
     integrity = AttributeProperty(default=100)
@@ -30,6 +32,7 @@ class Character(ObjectParent, DefaultCharacter):
     experience = AttributeProperty(default=0)
     faction = AttributeProperty(default=None)
     grid_rank = AttributeProperty(default="User")
+    rating = AttributeProperty(default=1000)
 
     def at_object_creation(self):
         """
@@ -48,6 +51,8 @@ class Character(ObjectParent, DefaultCharacter):
             self.experience = 0
         if self.grid_rank is None:
             self.grid_rank = "User"
+        if self.rating is None:
+            self.rating = 1000
         # faction intentionally left as None when unset; Epic 5 assigns it.
 
     # ------------------------------------------------------------------
