@@ -29,6 +29,8 @@ from world.zones.build_zones import (
 )
 from world.zones.generator import generate_zone
 
+REPOP_SCRIPT_TYPECLASS = "world.zones.repop.ZoneRepopScript"
+
 
 # ---------------------------------------------------------------------------
 # Pure-data tests (no DB, no Evennia)
@@ -293,6 +295,37 @@ try:
                                 band, archetype_band,
                                 f"{room.key!r} has level_band {band}, expected {archetype_band}",
                             )
+
+        # ------------------------------------------------------------------
+        # 9. ZoneRepopScript auto-start
+        # ------------------------------------------------------------------
+
+        def _repop_scripts(self):
+            """Return all ZoneRepopScript instances via ORM typeclass filter."""
+            from evennia.scripts.models import ScriptDB
+            return list(ScriptDB.objects.filter(
+                db_typeclass_path=REPOP_SCRIPT_TYPECLASS
+            ))
+
+        def test_repop_scripts_count_equals_zone_count(self):
+            """build_all_zones() starts exactly one ZoneRepopScript per zone (42 total)."""
+            scripts = self._repop_scripts()
+            self.assertEqual(
+                len(scripts), 42,
+                f"Expected 42 ZoneRepopScript instances after build; found {len(scripts)}. "
+                f"Keys: {[s.key for s in scripts]!r}",
+            )
+
+        def test_repop_scripts_are_persistent(self):
+            """Every ZoneRepopScript created by build_all_zones() is persistent."""
+            scripts = self._repop_scripts()
+            self.assertGreater(len(scripts), 0, "No ZoneRepopScript instances found")
+            for script in scripts:
+                with self.subTest(script=script.key):
+                    self.assertTrue(
+                        script.db_persistent,
+                        f"ZoneRepopScript {script.key!r} is not persistent",
+                    )
 
     class TestBuildAllZonesViaFullBuild(_EvenniaTest):
         """Verify build_grid.build() also triggers zone instantiation."""
