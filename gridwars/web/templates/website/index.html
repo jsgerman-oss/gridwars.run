@@ -1,0 +1,80 @@
+{% extends "website/base.html" %}
+
+{% block titleblock %}Online{% endblock %}
+
+{% block header_ext %}
+<!-- Google Fonts — JetBrains Mono + Inter (mirrors landing site) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="gw-index">
+
+  <!-- Wordmark + status -->
+  <header class="gw-hero">
+    <h1 class="gw-wordmark">GRIDWARS.RUN</h1>
+    <p class="gw-tagline">{{ game_name }} &mdash; server online</p>
+
+    <div class="gw-status-pill">
+      <span class="gw-status-dot" aria-hidden="true"></span>
+      ONLINE &nbsp;|&nbsp; {{ num_accounts_connected }} connected
+    </div>
+  </header>
+
+  <!-- Connect cards -->
+  <section class="gw-connect-section" aria-label="Connection options">
+    <div class="gw-section-label">/ connect</div>
+
+    <div class="gw-connect-grid">
+
+      <!-- Browser client -->
+      <div class="gw-card">
+        <div class="gw-card-label">web terminal</div>
+        <h2 class="gw-card-title">Play in Browser</h2>
+        <p class="gw-card-body">No install required. Launch the full-featured web terminal directly.</p>
+        <a class="gw-btn gw-btn-primary" href="/webclient/">open terminal</a>
+      </div>
+
+      <!-- SSH/Telnet -->
+      <div class="gw-card">
+        <div class="gw-card-label">mud client</div>
+        <h2 class="gw-card-title">Direct Connect</h2>
+        <p class="gw-card-body">Point any MUD client at the server address below.</p>
+        <code class="gw-cmd">gridwars.run&nbsp; port&nbsp;4000</code>
+        <p class="gw-cmd-note">or via telnet&nbsp;&mdash;&nbsp;port&nbsp;4000</p>
+      </div>
+
+      <!-- Landing site -->
+      <div class="gw-card">
+        <div class="gw-card-label">about</div>
+        <h2 class="gw-card-title">GridWars.run</h2>
+        <p class="gw-card-body">Learn about the game world, factions, and upcoming features.</p>
+        <a class="gw-btn gw-btn-secondary" href="https://gridwars.run/" target="_blank" rel="noopener">visit landing</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Server stats (minimal) -->
+  <section class="gw-stats-section" aria-label="Server statistics">
+    <div class="gw-section-label">/ system</div>
+    <div class="gw-stats-grid">
+      <div class="gw-stat">
+        <span class="gw-stat-value">{{ num_accounts_connected }}</span>
+        <span class="gw-stat-label">online now</span>
+      </div>
+      <div class="gw-stat">
+        <span class="gw-stat-value">{{ num_accounts_registered }}</span>
+        <span class="gw-stat-label">registered</span>
+      </div>
+      <div class="gw-stat">
+        <span class="gw-stat-value">{{ num_rooms }}</span>
+        <span class="gw-stat-label">rooms</span>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.gw-index -->
+{% endblock %}

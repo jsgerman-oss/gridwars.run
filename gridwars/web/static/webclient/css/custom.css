@@ -1,0 +1,308 @@
+/* GridWars.run — neon-grid webclient theme
+   Loaded after Evennia's webclient.css; this file overrides only what we change.
+   Palette mirrors landing/assets/style.css: void black + electric cyan + JetBrains Mono. */
+
+/* ── Font import ── */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+/* ── Design tokens ── */
+:root {
+  --gw-bg-void:     #060810;
+  --gw-bg-deep:     #0a0e1a;
+  --gw-bg-surface:  #0f1628;
+  --gw-bg-card:     #121a30;
+  --gw-grid-line:   rgba(0, 200, 255, 0.07);
+  --gw-cyan:        #00e5ff;
+  --gw-cyan-dim:    rgba(0, 229, 255, 0.6);
+  --gw-cyan-glow:   rgba(0, 229, 255, 0.15);
+  --gw-magenta:     #ff2d78;
+  --gw-indigo:      #4060ff;
+  --gw-amber:       #ffb020;
+  --gw-text-pri:    #e8f0ff;
+  --gw-text-sec:    rgba(200, 220, 255, 0.65);
+  --gw-text-muted:  rgba(150, 175, 220, 0.45);
+  --gw-border:      rgba(0, 229, 255, 0.12);
+  --gw-mono:        'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --gw-radius:      4px;
+  --gw-transition:  150ms ease;
+}
+
+/* ── Base reset ── */
+html, body {
+  background-color: var(--gw-bg-void);
+  color: var(--gw-text-pri);
+  font-family: var(--gw-mono);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ── Grid overlay (48px cells matching landing) ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--gw-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gw-grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure all child stacking contexts sit above the grid */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── GRIDWARS.RUN wordmark bar ── */
+#gw-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5rem;
+  background: rgba(6, 8, 16, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gw-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  z-index: 100;
+}
+
+#gw-wordmark {
+  font-family: var(--gw-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gw-cyan);
+  text-shadow: 0 0 12px var(--gw-cyan-glow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+#gw-wordmark:hover {
+  color: #fff;
+  text-shadow: 0 0 20px var(--gw-cyan-glow);
+}
+
+#gw-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+#gw-header-nav a {
+  font-family: var(--gw-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--gw-text-muted);
+  text-decoration: none;
+  transition: color var(--gw-transition);
+}
+#gw-header-nav a:hover { color: var(--gw-cyan); }
+
+/* Push client wrapper below the header */
+#clientwrapper {
+  padding-top: 2.5rem;
+  background-color: transparent;
+}
+
+/* ── Message window ── */
+#messagewindow {
+  background-color: transparent;
+  color: var(--gw-text-sec);
+  font-family: var(--gw-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 0.5rem;
+}
+
+/* Evennia message classes */
+.out {
+  color: var(--gw-text-sec);
+  background-color: transparent;
+}
+
+.sys { color: var(--gw-cyan); }          /* system messages */
+.err { color: var(--gw-magenta); }       /* error messages — use magenta not red */
+.inp { color: var(--gw-text-muted); }    /* echoed input */
+.prompt { color: var(--gw-text-pri); }   /* prompt */
+
+/* ── Input area ── */
+#input {
+  background: rgba(6, 8, 16, 0.92);
+  border-top: 1px solid var(--gw-border);
+  backdrop-filter: blur(8px);
+}
+
+#inputfield, #inputsizer {
+  background: var(--gw-bg-deep);
+  color: var(--gw-text-pri);
+  font-family: var(--gw-mono);
+  font-size: 0.9rem;
+  border: 1px solid var(--gw-border);
+  border-radius: var(--gw-radius);
+  padding: 0.4rem 0.6rem;
+  transition: border-color var(--gw-transition), box-shadow var(--gw-transition);
+  caret-color: var(--gw-cyan);
+}
+
+#inputfield:focus {
+  outline: none;
+  border-color: var(--gw-cyan-dim);
+  box-shadow: 0 0 0 2px var(--gw-cyan-glow);
+}
+
+/* Send button */
+#inputsend {
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid var(--gw-border);
+  border-radius: var(--gw-radius);
+  color: var(--gw-cyan);
+  font-family: var(--gw-mono);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all var(--gw-transition);
+  cursor: pointer;
+  padding: 0 0.875rem;
+}
+#inputsend:hover {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--gw-cyan-dim);
+  color: #fff;
+  box-shadow: 0 0 12px var(--gw-cyan-glow);
+}
+
+/* Prompt bar above input */
+.prompt {
+  color: var(--gw-text-pri);
+  font-family: var(--gw-mono);
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(0, 229, 255, 0.05);
+  padding: 0.2rem 0.5rem;
+}
+
+/* ── Toolbar buttons (split/pane/undo/options) ── */
+#toolbar {
+  z-index: 101;
+}
+
+#splitbutton,
+#panebutton,
+#undobutton,
+#optionsbutton {
+  color: var(--gw-text-muted);
+  background: transparent;
+  border: none;
+  transition: color var(--gw-transition);
+}
+#splitbutton:hover,
+#panebutton:hover,
+#undobutton:hover,
+#optionsbutton:hover {
+  color: var(--gw-cyan);
+}
+
+/* ── Connecting / no-script banner ── */
+#connecting {
+  background: rgba(6, 8, 16, 0.95);
+  color: var(--gw-text-sec);
+  font-family: var(--gw-mono);
+  border-bottom: 1px solid var(--gw-border);
+}
+
+/* ── GoldenLayout panel overrides ── */
+.lm_header {
+  background-color: var(--gw-bg-surface) !important;
+  border-bottom: 1px solid var(--gw-border) !important;
+}
+.lm_tab {
+  background: var(--gw-bg-deep) !important;
+  color: var(--gw-text-muted) !important;
+  border: 1px solid var(--gw-border) !important;
+  font-family: var(--gw-mono) !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.04em !important;
+}
+.lm_tab.lm_active {
+  background: var(--gw-bg-surface) !important;
+  color: var(--gw-cyan) !important;
+  border-bottom-color: var(--gw-bg-surface) !important;
+}
+.lm_content {
+  background: var(--gw-bg-void) !important;
+}
+.lm_splitter {
+  background: var(--gw-bg-surface) !important;
+}
+.lm_splitter:hover,
+.lm_splitter.lm_dragging {
+  background: var(--gw-cyan) !important;
+  opacity: 0.4;
+}
+
+/* ── Dialogs (help, options) ── */
+.dialog {
+  background-color: var(--gw-bg-card);
+  border: 1px solid var(--gw-border);
+  border-radius: var(--gw-radius);
+  color: var(--gw-text-pri);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--gw-border);
+}
+
+.dialogtitle {
+  background-color: var(--gw-bg-surface);
+  color: var(--gw-cyan);
+  font-family: var(--gw-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--gw-border);
+}
+
+.dialogcontent,
+#helpdialog .dialogcontent {
+  background-color: var(--gw-bg-deep);
+  color: var(--gw-text-sec);
+}
+
+.dialogclose { color: var(--gw-text-muted); }
+.dialogclose:hover { color: var(--gw-magenta); }
+
+/* ── Gutter / split handles ── */
+.gutter {
+  background-color: var(--gw-bg-surface);
+}
+.gutter:hover {
+  background-color: rgba(0, 229, 255, 0.15);
+}
+
+/* ── Card (Bootstrap override) ── */
+.card {
+  background-color: var(--gw-bg-card);
+  border: 1px solid var(--gw-border);
+}
+
+/* ── Focus ring (accessibility) ── */
+:focus-visible {
+  outline: 2px solid var(--gw-cyan);
+  outline-offset: 2px;
+  border-radius: var(--gw-radius);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--gw-bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.4); }
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  #gw-wordmark { font-size: 0.75rem; }
+  #gw-header-nav { display: none; }
+}
