@@ -29,6 +29,7 @@
     <div class="topbar-inner">
       <a href="/" class="site-wordmark" aria-label="GridWars.run — home">GRIDWARS.RUN</a>
       <nav class="topbar-nav" aria-label="Site navigation">
+        <a href="#how-to-play">How to Play</a>
         <a href="#connect">Connect</a>
         <a href="#factions">Factions</a>
         <a href="#roadmap">Roadmap</a>
@@ -73,7 +74,68 @@
       </div>
     </section>
 
-    <!-- ── Connect / How to Play ── -->
+    <!-- ── How to Play ── -->
+    <section id="how-to-play" class="how-to-play-section" aria-labelledby="how-to-play-title">
+      <div class="container">
+        <p class="section-label">Survival Brief</p>
+        <h2 class="section-title" id="how-to-play-title">How to Play</h2>
+        <p class="section-body">
+          Connect via telnet or browser, complete the Grid orientation, find your first NPC patrol, then step into the duel queue. Every match climbs — or drops — your ELO standing on the live leaderboard. Discs carry your kill record; no two are alike after a season of combat.
+        </p>
+
+        <ol class="how-to-play-steps" role="list">
+          <li class="htp-step">
+            <span class="htp-step-num" aria-hidden="true">01</span>
+            <div>
+              <p class="htp-step-title">Connect to the Grid</p>
+              <p class="htp-step-desc">Telnet to <code>game.gridwars.run&nbsp;4000</code> or open the web client. Create your character with <code>create&nbsp;&lt;name&gt;&nbsp;&lt;password&gt;</code>.</p>
+            </div>
+          </li>
+          <li class="htp-step">
+            <span class="htp-step-num" aria-hidden="true">02</span>
+            <div>
+              <p class="htp-step-title">Run the tutorial</p>
+              <p class="htp-step-desc">You spawn in Users' Sector. Type <code>look</code> to render your surroundings, <code>scan</code> for a tactical read, and follow the Welcome Program's prompts.</p>
+            </div>
+          </li>
+          <li class="htp-step">
+            <span class="htp-step-num" aria-hidden="true">03</span>
+            <div>
+              <p class="htp-step-title">Engage your first NPC</p>
+              <p class="htp-step-desc">Equip your starter Identity Disc with <code>equip&nbsp;&lt;disc&gt;</code>, then <code>strike</code> a patrolling Daemon to earn your first disc XP and level.</p>
+            </div>
+          </li>
+          <li class="htp-step">
+            <span class="htp-step-num" aria-hidden="true">04</span>
+            <div>
+              <p class="htp-step-title">Join the duel queue</p>
+              <p class="htp-step-desc">Type <code>@queue duel</code> when you're ready for PvP. The matchmaker pairs you by ELO bracket — accept the challenge window before it times out.</p>
+            </div>
+          </li>
+          <li class="htp-step">
+            <span class="htp-step-num" aria-hidden="true">05</span>
+            <div>
+              <p class="htp-step-title">Climb the leaderboard</p>
+              <p class="htp-step-desc">Win or lose, your ELO rating updates after every duel. Check your standing and discover high-value targets — the Grid's leaderboard is public and live.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="htp-cta">
+          <a
+            href="https://github.com/jsgerman-oss/gridwars.run/blob/main/docs/PLAYER.md"
+            class="btn btn-secondary"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Read the full player guide on GitHub"
+          >
+            Read the full player guide &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── How to Connect ── -->
     <section id="connect" class="connect-section" aria-labelledby="connect-title">
       <div class="container">
         <p class="section-label">Access the Grid</p>
