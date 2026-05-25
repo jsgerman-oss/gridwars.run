@@ -2,7 +2,7 @@
 Unit tests for world.build_grid.build().
 
 Covers (gridwars_run-62h.2 / Epic 9, gridwars_run-wpj / e16.2):
-  1. build() creates exactly 6 rooms and 10 exits tagged with ('gridwars-core', 'world_build').
+  1. build() creates exactly 7 rooms and 28 exits tagged with ('gridwars-core', 'world_build').
   2. build() is idempotent — calling it twice produces the same counts.
   3. The Users' Sector room is findable by its slug tag.
   4. The Uplink Node room is findable by its slug tag (e16.2).
@@ -99,11 +99,11 @@ class BuildGridTestCase(EvenniaTest):
         ]
 
     # ------------------------------------------------------------------
-    # 1. 7 rooms + 12 exits created (e19.8: Grid Junction + 2 junction exits)
+    # 1. 7 rooms + 28 exits created (e19.8: Grid Junction + 12 sector + 8 forward gate + 8 return)
     # ------------------------------------------------------------------
 
-    def test_build_creates_7_rooms_and_12_exits(self):
-        """After build(), count 7 rooms and 12 exits tagged gridwars-core/world_build."""
+    def test_build_creates_7_rooms_and_28_exits(self):
+        """After build(), count 7 rooms and 28 exits tagged gridwars-core/world_build."""
         tagged = self._tagged_objects()
         rooms = self._rooms(tagged)
         exits = self._exits(tagged)
@@ -114,8 +114,8 @@ class BuildGridTestCase(EvenniaTest):
             f"{[(o.key, getattr(o, 'destination', '(no dest)')) for o in tagged]}",
         )
         self.assertEqual(
-            len(exits), 12,
-            f"Expected 12 exits, got {len(exits)}: {[e.key for e in exits]}",
+            len(exits), 28,
+            f"Expected 28 exits, got {len(exits)}: {[e.key for e in exits]}",
         )
 
     # ------------------------------------------------------------------
@@ -134,8 +134,8 @@ class BuildGridTestCase(EvenniaTest):
             f"Idempotency fail — rooms: expected 7, got {len(rooms)}",
         )
         self.assertEqual(
-            len(exits), 12,
-            f"Idempotency fail — exits: expected 12, got {len(exits)}",
+            len(exits), 28,
+            f"Idempotency fail — exits: expected 28, got {len(exits)}",
         )
 
     # ------------------------------------------------------------------

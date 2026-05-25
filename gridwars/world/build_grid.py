@@ -294,9 +294,15 @@ def build_junction_topology(junction_room):
     exits_created = 0
     zone_category = "world_build"  # matches build_zones.ZONE_CATEGORY
 
+    from world.zones.generator import generate_zone
+
     for exit_name, aliases, archetype_id, variant_index, min_level in JUNCTION_ZONE_EXITS:
-        # Zone entry room is tagged "room:<arch>:<var>:r0" by build_zones._room_tag.
-        entry_tag = f"room:{archetype_id}:{variant_index}:r0"
+        # The entry room is the first room in the generated spec (index 0).
+        # Its slug is {archetype_id}_v{variant_index}_{role} — determined by
+        # generate_zone (pure, no I/O), so safe to call here.
+        spec = generate_zone(archetype_id, variant_index)
+        entry_slug = spec.rooms[0].slug
+        entry_tag = f"room:{archetype_id}:{variant_index}:{entry_slug}"
         zone_rooms = search_tag(key=entry_tag, category=zone_category)
         if not zone_rooms:
             # Zone not yet built (e19.7 not run, or test environment) -- skip.
@@ -304,15 +310,17 @@ def build_junction_topology(junction_room):
         zone_entry = zone_rooms[0]
 
         # Forward: Grid Junction -> zone entry (level-gated).
-        _ensure_level_gate_exit(
-            from_slug="grid_junction",
-            from_room=junction_room,
-            to_room=zone_entry,
-            exit_name=exit_name,
-            aliases=aliases,
-            min_level=min_level,
-        )
-        exits_created += 1
+        forward_slug = _exit_slug("grid_junction", exit_name)
+        if not search_tag(key=forward_slug, category=CATEGORY):
+            _ensure_level_gate_exit(
+                from_slug="grid_junction",
+                from_room=junction_room,
+                to_room=zone_entry,
+                exit_name=exit_name,
+                aliases=aliases,
+                min_level=min_level,
+            )
+            exits_created += 1
 
         # Return: zone entry -> Grid Junction (plain, no gate).
         return_slug = f"zone_entry_{archetype_id}_{variant_index}__exit__grid-junction"
@@ -351,6 +359,10 @@ def build():
 
     _spawn_welcome_program(rooms["uplink_node"])
 
+    # Instantiate the 42 procedurally-generated zone variants (e19.7).
+    from world.zones.build_zones import build_all_zones
+    build_all_zones()
+
     # Wire Grid Junction -> zone entry rooms (requires e19.7 zones to exist).
     junction_exits = build_junction_topology(rooms["grid_junction"])
 
@@ -360,10 +372,6 @@ def build():
         f"(tag='{TAG_KEY}', category='{CATEGORY}'). "
         f"Junction topology: {junction_exits} zone-entry exits wired."
     )
-
-    # Instantiate the 42 procedurally-generated zone variants (e19.7).
-    from world.zones.build_zones import build_all_zones
-    build_all_zones()
 
 
 if __name__ == "__main__":
