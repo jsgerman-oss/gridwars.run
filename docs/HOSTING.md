@@ -34,9 +34,8 @@ The workflow is at `.github/workflows/cf-pages-deploy.yml`.
 2. Click **Create Token**.
 3. Use the **Custom token** option with these permissions:
    - **Account** → `Cloudflare Pages` → `Edit`
-4. Under **Account Resources**, select **Audit Identity** (account ID `4bf8ccaf39f18a8a46b21a317e2d3a1b`).
-5. Click **Continue to summary** → **Create Token**.
-6. Copy the token — it will not be shown again.
+4. Click **Continue to summary** → **Create Token**.
+5. Copy the token — it will not be shown again.
 
 ### Step 3 — Add the token to GitHub Secrets
 
@@ -52,7 +51,7 @@ The deploy workflow reads `${{ secrets.CLOUDFLARE_API_TOKEN }}` automatically.
 
 1. Go to [Cloudflare Dashboard → Pages → gridwars-run → Custom domains](https://dash.cloudflare.com/?to=/:account/pages/view/gridwars-run/domains).
 2. Click **Set up a custom domain**.
-3. Enter `gridwars.run` → follow the prompts. Since the domain is already on Cloudflare (Audit Identity account), DNS records are added automatically.
+3. Enter `gridwars.run` → follow the prompts. Since the domain is already on Cloudflare, DNS records are added automatically.
 4. Repeat for `www.gridwars.run` if desired (the `landing/_redirects` file already redirects `www` → apex).
 
 ---
@@ -91,7 +90,6 @@ The `landing/_redirects` file ensures `www.gridwars.run/*` always redirects to `
 |-------------|-----|
 | Production (CF Pages) | `https://gridwars-run.pages.dev/` |
 | Production (custom domain, once Step 4 done) | `https://gridwars.run/` |
-| Cloudflare account | Audit Identity — ID `4bf8ccaf39f18a8a46b21a317e2d3a1b` |
 | GitHub repo | `https://github.com/jsgerman-oss/gridwars.run` |
 
 ---
