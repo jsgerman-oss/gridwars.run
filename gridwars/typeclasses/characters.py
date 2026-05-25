@@ -149,13 +149,32 @@ class Character(ObjectParent, DefaultCharacter):
         """
         Called after the Account puppets this Character.
 
-        Sends the themed LOGIN message. If the Character has no faction,
-        also sends the FACTION_NUDGE directing them to the faction command.
-        Nudge fires once per puppet event (i.e. each login session); Epic 5
-        will gate stricter "once per lifetime" semantics when the faction
-        system lands.
+        On the character's FIRST ever login, teleports them to the Uplink Node
+        tutorial sector (tag "uplink_node", category "world_build") and sets
+        ``db.has_logged_in_once = True`` so subsequent logins skip the teleport.
+        If the Uplink Node is not found (world not yet built), logs a warning
+        and falls back to existing behaviour — login does NOT crash.
+
+        After the first-login branch, sends the themed LOGIN message and, if the
+        Character has no faction, the FACTION_NUDGE.
         """
         super().at_post_puppet(**kwargs)
+
+        # --- first-login routing (Epic 16.5) ---
+        if not self.db.has_logged_in_once:
+            from evennia.utils import logger
+            from evennia.utils.search import search_tag
+
+            results = search_tag("uplink_node", category="world_build")
+            if results:
+                self.move_to(results[0], quiet=True, move_type="teleport")
+            else:
+                logger.log_warn(
+                    "Character.at_post_puppet: uplink_node not found — "
+                    "world not yet built? Skipping first-login routing."
+                )
+            self.db.has_logged_in_once = True
+
         from world.messages import FACTION_NUDGE, LOGIN, render
 
         self.msg(render(LOGIN, name=self.key))
