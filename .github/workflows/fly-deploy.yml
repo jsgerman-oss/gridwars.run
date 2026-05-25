@@ -1,0 +1,41 @@
+# Deploy the GridWars backend to Fly.io when game code reaches main.
+# Before the first run, add FLY_API_TOKEN in GitHub repository settings:
+# Settings -> Secrets and variables -> Actions -> New repository secret.
+
+name: fly-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gridwars/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fly-deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy GridWars backend
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: >
+          flyctl deploy
+          --remote-only
+          --app gridwars-run
+          --config gridwars/fly.toml
+          --dockerfile gridwars/Dockerfile
