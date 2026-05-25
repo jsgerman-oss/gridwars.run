@@ -2,19 +2,18 @@
 
 <img src="gridwars-banner.png" alt="GridWars.run" width="800" />
 
-### Open-source PvP MUD on the Grid — full PvP, no deletion, no pay-to-win
+### TRON-themed hosted MUD. Full PvP. No deletion. Free to play.
 
-[![Status](https://img.shields.io/badge/status-pre--alpha-orange?style=flat-square)]()
+[![Status](https://img.shields.io/badge/status-pre--launch-orange?style=flat-square)]()
 [![License](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue?style=flat-square)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12+-3776AB?style=flat-square)](pyproject.toml)
 [![Engine](https://img.shields.io/badge/engine-Evennia_v6.0.0-green?style=flat-square)](vendor/evennia)
 [![CI](https://github.com/jsgerman-oss/gridwars.run/actions/workflows/test.yml/badge.svg?style=flat-square)](.github/workflows/test.yml)
 
-[**Play**](#play) ·
-[**Why GridWars**](#why-gridwars) ·
-[**Features**](#feature-catalog) ·
-[**Architecture**](#architecture) ·
-[**Contributing**](#contributing)
+[Play](#quickstart) |
+[Features](#features) |
+[Development](#architecture-and-development) |
+[Docs](#docs)
 
 </div>
 
@@ -22,337 +21,97 @@
 
 ## What is GridWars.run
 
-GridWars.run is an open-source, text-based real-time PvP world built for the Grid — a cyber-digital arena inspired by TRON and classic digital combat aesthetics. Five sectors span the map: Users' Sector (the spawn point), Lightcycle Causeway, Daemon Gate, Archive Node, and Combat Grid. Choose your allegiance — **Users**, **Programs**, or **Daemons** — and traverse the causeway, breach the gate, or derez rival programs in the Combat Grid.
+GridWars.run is a TRON-themed, hosted, online-only MUD where Users, Programs, and Daemons fight across a persistent cyber-grid. It is free to play, terminal-native, browser-friendly, and built around full PvP without character deletion or pay-to-win shortcuts: if you are derezzed, you respawn in Users' Sector with your identity intact, your faction still registered, and your disc progress preserved.
 
-Unlike modern pay-to-win MMOs, GridWars has no subscription, no cash shop, no character deletion, and no server-side secrets. Unlike classic AberMUD-era games, GridWars ships with a web client alongside the telnet port and is built on a modern Python 3.12 stack.
+## Quickstart
 
-The engine is Evennia v6.0.0 — a mature Python/Django MUD framework — vendored at `vendor/evennia/` and never modified. Game logic lives entirely in the `gridwars/` game directory. The full codebase is AGPL-3.0-or-later.
+Connect to the live Grid:
 
-If you want to play, see [Play](#play). If you want to contribute or run a local server for testing, see [Development](#development).
-
----
-
-## Play
-
-Connect to the official GridWars.run server:
-
-- **Telnet:** `telnet gridwars.run 4000`
-- **Web client:** <https://gridwars.run>
-- **MUD client:** any modern client works — Mudlet, TinTin++, MUSHclient, or your terminal's built-in telnet
-
-> **Public server status: pre-launch.** The hosted server at gridwars.run is not yet deployed. Once it is live, you will be able to connect without installing anything. GridWars.run is an online-only service — there is no self-hosted edition.
-
-### First playable commands
-
-Once connected and faction-aligned (`faction choose Users` / `Programs` / `Daemons`):
-
-| Command | What it does |
-|---|---|
-| `status` | Identity disc HUD — integrity, energy, exp, rank, faction |
-| `scan` | Tactical sector view — programs (faction-tinted), exits, flavor |
-| `faction` | List the three factions and your current alignment |
-| `faction choose <name>` | Align with a faction (one-shot; admin override required to change) |
-| `strike <target>` | Same-sector PvP. Defeat sends the target back to Users' Sector with restored integrity. Characters are never deleted. |
-| `help gridwars` | Curated command index by category |
-
----
-
-## Why GridWars
-
-**Full PvP. No pay-to-win. No deletion.** Defeat in GridWars respawns — the losing program is moved back to Users' Sector with restored integrity. Every character comes back. Combat is mechanical (deterministic base damage plus a jitter roll), not retributive. There is no administrator power to permanently remove a character.
-
-**Built on Evennia, extended via game directory.** Evennia v6.0.0 is vendored under `vendor/evennia/` (BSD-3-Clause), pinned to a specific commit, and never modified. GridWars game logic — commands, typeclasses, world layout, combat math — lives in `gridwars/`. Upgrading the engine is `git submodule update` plus a world rebuild. There is no monkey-patching, no fork, no divergence to maintain.
-
-**Three factions, real consequences.** Users / Programs / Daemons are not cosmetic tags. Faction membership tints `scan` output, drives themed broadcast prose on joins and defeats, and (roadmap) will gate sector access. Choosing a faction is a one-shot, one-way decision enforced in code.
-
-**Terminal-native, web-friendly.** Telnet on port 4000 for purists; Evennia's web client on port 4001 for everyone else. No mobile yet — that's on the roadmap.
-
-**Open-source AGPL.** The whole game is AGPL-3.0-or-later. The vendored Evennia layer keeps its BSD-3-Clause license untouched; our code is AGPL with no exceptions.
-
-### How GridWars compares
-
-| | GridWars.run | Generic commercial MMO | Generic AberMUD-era MUD |
-|---|:---:|:---:|:---:|
-| Hosted public server | ✅ | ✅ | ✗ |
-| Real-time PvP | ✅ | ✅ | Partial |
-| Faction-driven | ✅ | Partial | ✗ |
-| Open source | ✅ | ✗ | Partial |
-| Web client | ✅ | ✅ | ✗ |
-| Telnet client | ✅ | ✗ | ✅ |
-| No subscription | ✅ | ✗ | Partial |
-| No character deletion | ✅ | ✗ | ✗ |
-
----
-
-## Feature catalog
-
-Status legend: **✅ Shipping · 🔬 Alpha · ⚠️ Best-effort · 🛣️ Roadmap**
-
-### World & sectors
-
-| Capability | Status | Source |
-|---|:---:|---|
-| 5 sectors with cardinal exits | ✅ | `gridwars/world/build_grid.py` |
-| Idempotent build (tagged `gridwars-core`/`world_build`) | ✅ | `gridwars/world/build_grid.py` |
-| Tag-based spawn resolution (Account.create_character hook) | ✅ | `gridwars/typeclasses/accounts.py` |
-| Sector ownership / capture-the-grid | 🛣️ | — |
-
-### Character system
-
-| Capability | Status | Source |
-|---|:---:|---|
-| Character typeclass with persistent stats | ✅ | `gridwars/typeclasses/characters.py` |
-| AttributeProperty fields: integrity / energy / experience / faction / grid_rank | ✅ | `gridwars/typeclasses/characters.py` |
-| Clamping helpers: take_damage / heal / gain_experience / reset_for_respawn | ✅ | `gridwars/typeclasses/characters.py` |
-| Login / logout hooks (at_post_puppet / at_pre_unpuppet) | ✅ | `gridwars/typeclasses/characters.py` |
-| 9 unit tests | ✅ | `gridwars/typeclasses/tests/test_characters.py` |
-
-### Faction system
-
-| Capability | Status | Source |
-|---|:---:|---|
-| 3-faction registry (Users / Programs / Daemons) | ✅ | `gridwars/world/factions.py` |
-| `faction` list command | ✅ | `gridwars/commands/factions.py` |
-| `faction choose <name>` + themed room broadcast | ✅ | `gridwars/commands/factions.py` |
-| One-shot enforcement (admin override required to change) | ✅ | `gridwars/commands/factions.py` |
-| 8 unit tests | ✅ | `gridwars/commands/tests/test_factions.py` |
-
-### Combat
-
-| Capability | Status | Source |
-|---|:---:|---|
-| `strike <target>` same-sector PvP | ✅ | `gridwars/commands/combat.py` |
-| Deterministic + jitter damage (BASE_DAMAGE + randint(0, RANDOM_BONUS_MAX)) | ✅ | `gridwars/world/combat.py` |
-| Defeat flow: tag-resolved respawn to Users' Sector + integrity reset + attacker XP | ✅ | `gridwars/commands/combat.py` |
-| No character deletion under any circumstance (invariant) | ✅ | `gridwars/commands/combat.py` |
-| 5 unit tests | ✅ | `gridwars/commands/tests/test_strike.py` |
-| Lightcycle duels (instanced PvP races) | 🛣️ | — |
-| Identity discs (wieldable weapons w/ cooldowns) | 🛣️ | — |
-
-### Info & UX commands
-
-| Capability | Status | Source |
-|---|:---:|---|
-| `status` — Identity Disc HUD with color thresholds | ✅ | `gridwars/commands/status.py` |
-| `scan` — tactical sector view with faction tint | ✅ | `gridwars/commands/scan.py` |
-| `help gridwars` — curated command index | ✅ | `gridwars/world/help_entries.py` |
-| 9 unit tests across status + scan | ✅ | `gridwars/commands/tests/` |
-
-### Theming
-
-| Capability | Status | Source |
-|---|:---:|---|
-| Connection-screen banner with project tagline | ✅ | `gridwars/server/conf/connection_screens.py` |
-| Login / logout themed messages | ✅ | `gridwars/world/messages.py` |
-| Faction-unaffiliated nudge on first login | ✅ | `gridwars/world/messages.py` |
-| Per-faction MOTDs | 🛣️ | — |
-
-### Engine integration
-
-| Capability | Status | Source |
-|---|:---:|---|
-| Vendored Evennia v6.0.0 (BSD-3-Clause, untouched) | ✅ | `vendor/evennia/` |
-| Python 3.12+ | ✅ | `pyproject.toml` |
-| Django direct-call migrate (non-interactive) | ✅ | `Makefile` |
-| Telnet 4000 + web client 4001 (Evennia defaults) | ✅ | `gridwars/server/conf/settings.py` |
-| Postgres backend | 🔬 | `vendor/evennia/` supports it; untested at scale here |
-
-### Tests & CI
-
-| Capability | Status | Source |
-|---|:---:|---|
-| 34 unit tests (real-DB via EvenniaTest / EvenniaCommandTest) | ✅ | `gridwars/{typeclasses,commands,world}/tests/` |
-| GitHub Actions CI on push + PR | ✅ | `.github/workflows/test.yml` |
-| Coverage gates | 🛣️ | — |
-
-### Docs
-
-| Capability | Status | Source |
-|---|:---:|---|
-| README (this file) | ✅ | `README.md` |
-| CONTRIBUTING.md | ✅ | `CONTRIBUTING.md` |
-| AGENTS.md (for AI contributor agents) | ✅ | `AGENTS.md` |
-| SETUP.md (run procedure + world build) | ✅ | `docs/SETUP.md` |
-| CONVENTIONS.md (SPDX header rule) | ✅ | `docs/CONVENTIONS.md` |
-| THIRD_PARTY_NOTICES.md (Evennia BSD-3 attribution) | ✅ | `THIRD_PARTY_NOTICES.md` |
-
----
-
-## Architecture
-
-```mermaid
-flowchart LR
-    subgraph Client["Clients"]
-        tel[Telnet :4000]
-        web[Web client :4001]
-    end
-
-    subgraph Server["Evennia server"]
-        tel --> ev[Evennia core\nnetworking · sessions · web]
-        web --> ev
-        ev --> cmdset[CharacterCmdSet\ndefault_cmdsets.py]
-        cmdset --> cmds[Commands\nCmdStatus · CmdScan\nCmdFaction · CmdStrike]
-        cmds --> char[Character typeclass\nintegrity · energy · exp\nfaction · grid_rank]
-        char --> rooms[Rooms — 5 sectors\ntagged gridwars-core/world_build]
-        rooms --> db[(SQLite DB\nEvennia-managed)]
-    end
-
-    subgraph Hooks["Account hooks"]
-        acct[Account.create_character] -->|search_tag users_sector| spawn[spawn location]
-        spawn --> char
-    end
+```bash
+telnet game.gridwars.run 4000
 ```
 
-**Extension model.** Game code lives in `gridwars/`; vendored Evennia in `vendor/evennia/` is read-only. To add a feature, write a `Command` subclass in `gridwars/commands/` and register it in `gridwars/commands/default_cmdsets.py`. See `gridwars/commands/combat.py` for a worked example. New sectors go in `gridwars/world/build_grid.py`; new factions go in `gridwars/world/factions.py`.
+Or open the web client:
 
-**State model.** Character stats are persistent via Evennia's `AttributeProperty` descriptors — no manual `save()` calls, no raw DB queries. Rooms are tagged at build time for idempotent recreation. Spawn location is resolved at character-creation time via `search_tag("users_sector", category="gridwars-core")`.
+<https://game.gridwars.run>
 
-**Combat invariant.** Defeat triggers `reset_for_respawn()` on the losing character followed by `move_to(Users' Sector)`. There is no `.delete()` call anywhere in `gridwars/commands/combat.py`. This invariant is enforced by the test suite: `test_defeat_triggers_respawn_and_xp` asserts the Character row still exists in the database after a defeat.
+New players should start with the [Player Guide](docs/PLAYER.md). It covers account creation, first-session commands, faction choice, lightcycle duels, ratings, disc leveling, sector capture, and daemon PvE.
 
----
+Useful first commands:
 
-## Customizing GridWars
+| Command | Purpose |
+|---|---|
+| `look` | Render the current sector. |
+| `scan` | Tactical view: players, exits, faction control, local threats. |
+| `status` | Identity Disc HUD: integrity, energy, XP, rank, faction, disc state. |
+| `faction` | List factions and show your alignment. |
+| `faction choose <name>` | Join Users, Programs, or Daemons. This is a one-shot choice. |
+| `@queue duel` | Enter matchmaking for a rated lightcycle duel. |
+| `@leaderboard` | Show the top-rated programs on the Grid. |
 
-GridWars is structured for extension. Every game-specific concern lives in `gridwars/`; the vendored engine is never touched.
+## Features
 
-**Add a new in-game command.** Write a `Command` subclass in `gridwars/commands/<your_command>.py` and register it in `gridwars/commands/default_cmdsets.py`. The `gridwars/commands/combat.py` `CmdStrike` class is a worked example — it shows target resolution, error handling, stat mutation, and defeat flow.
+**Lightcycle duels.** Challenge a same-sector target with `challenge <target>` or enter open matchmaking with `@queue duel`. Accepted matches move both players into a private DuelArena. First to land three successful strikes wins; both players return to their pre-duel sector afterward.
 
-**Add a new sector.** Extend the `SECTORS` dict and `EXITS` table in `gridwars/world/build_grid.py` with your new room. Re-run the build script — it is idempotent, so existing rooms are not recreated.
+**Matchmaking, ELO, and rewards.** The persistent matchmaking script pairs queued players automatically. Duel wins update ELO ratings, feed the public `@leaderboard`, award character XP, and grant equipped-disc XP through the post-duel reward hook.
 
-**Add a new faction.** Extend the faction registry in `gridwars/world/factions.py`. The `faction` list command and `faction choose` command pick up new entries automatically via the registry.
+**Identity discs.** Discs are equipment, not flavor text. `equip <disc>` slots one from your inventory, adds damage to `strike`, applies cooldowns, and tracks XP from combat. Discs level from 1 to 5, increasing their damage bonus as they grow.
 
-**Tune combat numbers.** Edit the constants in `gridwars/world/combat.py` — `BASE_DAMAGE`, `RANDOM_BONUS_MAX`, `EXP_ON_VICTORY`, `RESPAWN_INTEGRITY`. No other code changes are needed.
+**Factions.** Users, Programs, and Daemons have distinct lore, scan colors, combat messaging, and sector-control ambitions. Faction registration is persistent and intentionally hard to change.
 
-**Change branding.** Replace the content in `gridwars/server/conf/connection_screens.py` (the MOTD shown on connect) and `gridwars/world/messages.py` (login / logout / defeat prose templates).
+**Ownership and capture.** `capture` claims the current sector for your faction. Control appears in `scan` and `status`, making the Grid's territorial state visible to everyone moving through it.
 
-Full contributor guide: [`CONTRIBUTING.md`](CONTRIBUTING.md). AI agent guidance: [`AGENTS.md`](AGENTS.md).
+**Daemon PvE.** Daemon NPCs patrol, sense non-Daemon characters, strike with the same combat model as players, and respawn through scripted patrol and repop systems. They make the Grid hostile even when no players are waiting in-sector.
 
----
+**42 generated zones.** Epic 19 added a seeded zone pipeline: eight archetypes expand into 42 deterministic, level-banded zones with generated rooms, exits, prose, spawn tables, and daemon palettes. Zone content is idempotent, so rebuilds skip existing rooms rather than duplicating the Grid.
 
-## Roadmap
+**No character deletion.** Defeat derezzes and respawns; it does not delete. The core invariant is that a Character remains a Character. Mechanics that remove pressure should respawn, demote, debuff, exile, or move the player, never erase them.
 
-| Feature | Status | Notes |
-|---|:---:|---|
-| Public server launch at gridwars.run | 🛣️ | Pending deploy — telnet gridwars.run 4000 / https://gridwars.run |
-| Lightcycle duels (instanced PvP) | 🛣️ | Faction-rivalry mechanic in the Causeway |
-| Daemon AI (autonomous NPCs) | 🛣️ | Patrol sector borders, attack on sight |
-| Sector ownership / capture | 🛣️ | Faction-controlled zones with permission semantics |
-| Identity discs (weapons) | 🛣️ | Cooldowns, modifiers, weapon-class diversity |
-| Per-faction MOTDs | 🛣️ | Faction-specific login messages |
-| Web client polish | 🛣️ | Out-of-the-box Evennia web is functional but plain |
-| Mobile clients | 🛣️ | Long-term |
-| Postgres production path | 🛣️ | Tested + documented |
-| `make build-world` Makefile target | 🛣️ | Wrap the current Django-shell invocation |
+## Architecture and Development
 
----
+GridWars.run is an Evennia v6.0.0 game on Python 3.12+. Evennia is vendored under [vendor/evennia](vendor/evennia) and treated as read-only. All game-specific code lives in [gridwars](gridwars): commands, typeclasses, world systems, server settings, web assets, tests, and generated content hooks.
 
-## Development
+The main extension points are straightforward:
 
-> If you want to **play**, see [Play](#play). The setup below is for **contributing** — running a local copy to test changes before opening a PR.
+| Area | Path |
+|---|---|
+| Commands | [gridwars/commands](gridwars/commands) |
+| Character, disc, daemon, exit typeclasses | [gridwars/typeclasses](gridwars/typeclasses) |
+| Combat, duels, factions, ownership, matchmaking | [gridwars/world](gridwars/world) |
+| Generated zone pipeline | [gridwars/world/zones](gridwars/world/zones) |
+| Server configuration | [gridwars/server/conf](gridwars/server/conf) |
 
-Want to contribute? Run a local dev server to test your changes:
+Local setup is for contributors testing changes before review:
 
 ```bash
 git clone --recurse-submodules https://github.com/jsgerman-oss/gridwars.run.git
 cd gridwars.run
-make install          # creates .venv/ with Python 3.12, installs vendored Evennia
-make migrate          # one-time: initialise the SQLite DB (non-interactive)
-make createsuperuser  # interactive: create your in-game #1 character
-make run              # boot the server (telnet localhost 4000, web localhost 4001)
+make install
+make migrate
+make createsuperuser
+make run
 ```
 
-Then connect locally:
+Then connect locally with `telnet localhost 4000` or open <http://localhost:4001>. Run `make test` before opening a pull request. CI runs the same test target on push and PR.
 
-- **Telnet:** `telnet localhost 4000`
-- **Web client:** <http://localhost:4001>
+Two Evennia details matter in this codebase. First, `AttributeProperty` fields are read and written directly (`char.integrity`, `char.rating`, `disc.level`); do not use raw attribute lookups for normal gameplay state unless a specific typeclass edge case requires it. Second, settings paths are relative to the game directory, so typeclass paths look like `typeclasses.characters.Character`, not `gridwars.typeclasses.characters.Character`.
 
-<details>
-<summary><b>Platform-specific prerequisites</b></summary>
+World construction is idempotent. Core sectors are tagged during `world.build_grid`, generated zones are tagged under the shared `world_build` category, and character spawn resolves by tag instead of a hard-coded dbref. That keeps rebuilds and migrations predictable while the hosted Grid evolves.
 
-**macOS** (Intel + Apple Silicon)
-- Python 3.12+: `brew install python@3.12`
-- Git with submodule support is included in Xcode Command Line Tools
-- `make` is included in Xcode Command Line Tools
+## Docs
 
-**Linux** (Ubuntu / Debian / Fedora / Arch)
-- Python 3.12 + venv: `apt-get install python3.12 python3.12-venv` (or distro equivalent)
-- `make`, `git` via your package manager
-
-**Windows**
-- WSL2 is strongly recommended — Evennia is largely POSIX-oriented
-- Inside WSL2, follow the Linux instructions above
-
-</details>
-
-### Build the world
-
-`make run` boots an empty server. To populate the five sectors before players connect:
-
-```bash
-# After make migrate, before players log in — run the world build script:
-cd gridwars && ../.venv/bin/python -c "\
-import os, django; \
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.conf.settings'); \
-django.setup(); from world import build_grid"
-```
-
-The build is idempotent — running it twice leaves the world unchanged. Full setup procedure including update-after-pull: [`docs/SETUP.md`](docs/SETUP.md).
-
-### Make targets
-
-```bash
-make install        # creates .venv/, installs vendored Evennia editable
-make migrate        # one-time DB init
-make test           # runs 34 tests via evennia test .
-make run            # boots server (telnet 4000, web 4001)
-make stop           # stops cleanly
-make createsuperuser  # create/reset the superuser character
-```
-
-CI runs `make test` on every push and PR against `main`. A green CI run is the bar for review. See [`.github/workflows/test.yml`](.github/workflows/test.yml) for the pipeline definition.
-
----
-
-## Documentation
-
-| | |
+| Guide | Purpose |
 |---|---|
-| Setup + run procedure | [`docs/SETUP.md`](docs/SETUP.md) |
-| Coding conventions (SPDX headers, etc.) | [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) |
-| Contributor guide | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
-| AI agent guidance (lessons learned) | [`AGENTS.md`](AGENTS.md) |
-| Third-party attribution | [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) |
-| In-game help index | `help gridwars` (in-game command) |
-
----
-
-## Contributing
-
-No CLA. Optional DCO sign-off (`git commit -s`) if you prefer it.
-
-- **Add a command, sector, or faction.** See [Customizing GridWars](#customizing-gridwars) above and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full review and branch policy.
-- **Bug fixes and tests.** Test files live next to the code they test (`gridwars/<package>/tests/test_*.py`). Run `make test` before opening a PR.
-- **The absolute rule: do not edit `vendor/evennia/`.** Extend GridWars via the game directory. This is the only hard rule — everything else is a guideline.
-
-Full review process and branch policy: [`CONTRIBUTING.md`](CONTRIBUTING.md).
-
----
+| [Player Guide](docs/PLAYER.md) | How to connect, survive, duel, level discs, and read the Grid. |
+| [Hosting Guide](docs/HOSTING.md) | Cloudflare Pages deployment plus operator snippets for queue, ratings, discs, and arena cleanup. |
+| [Zone Overview](docs/ZONES.md) | Player-facing overview of the generated zone set. |
+| [World Content Runbook](docs/operations/world-content-runbook.md) | Operator runbook for generated world content. |
+| [Contributing](CONTRIBUTING.md) | Branch policy, review workflow, and project conventions. |
+| [Setup](docs/SETUP.md) | Local contributor setup and world build procedure. |
+| [Conventions](docs/CONVENTIONS.md) | SPDX and source-file conventions. |
 
 ## License
 
-GridWars.run game code is licensed [AGPL-3.0-or-later](LICENSE). SPDX convention: every new GridWars source file begins with `SPDX-License-Identifier: AGPL-3.0-or-later`. See [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) for the full header rule.
+GridWars.run game code is licensed [AGPL-3.0-or-later](LICENSE). Vendored Evennia retains its [BSD-3-Clause](vendor/evennia/LICENSE.txt) license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution.
 
-Vendored Evennia retains its [BSD-3-Clause](vendor/evennia/LICENSE.txt) license, preserved untouched in `vendor/evennia/`. Third-party attribution: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
-
----
-
-## See also
-
-- [`CHANGELOG.md`](CHANGELOG.md) — version history
-- [`SECURITY.md`](SECURITY.md) — vulnerability reporting via GitHub Security Advisories
-- [Evennia](https://www.evennia.com) — the engine GridWars extends
-- [Evennia v6.0.0 release](https://github.com/evennia/evennia/releases/tag/v6.0.0) — pinned upstream version
-
----
-
-<sub>Built with <a href="https://www.evennia.com">Evennia</a>. Logo / theming &copy; 2026 Jay German.</sub>
+<sub>Built with <a href="https://www.evennia.com">Evennia</a>. Logo and theming &copy; 2026 Jay German.</sub>
