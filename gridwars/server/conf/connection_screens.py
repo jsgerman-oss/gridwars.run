@@ -2,14 +2,14 @@
 """
 GridWars.run connection screens.
 
-Shown to clients on connect (CONNECTION_SCREEN). Banner is ≤ 78 visual
+Shown to clients on connect (CONNECTION_SCREEN). Banner is <= 78 visual
 columns for telnet clients. ANSI color via Evennia color codes (|c |y |w |n);
 these degrade cleanly on non-ANSI clients.
 """
 
 # Evennia reads any module-level string variable as a candidate screen
 # (picks at random if more than one is defined). We define exactly one.
-# All lines ≤ 78 visual cols.
+# All lines <= 78 visual cols.
 
 CONNECTION_SCREEN = """\
 |c
