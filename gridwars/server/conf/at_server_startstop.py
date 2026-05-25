@@ -29,8 +29,18 @@ def at_server_start():
     """
     This is called every time the server starts up, regardless of
     how it was shut down.
+
+    Ensures the MatchmakingScript singleton is running after every boot
+    or ``evennia reload``. The script is persistent=True so it survives
+    reloads in the DB, but we guard with ScriptDB.objects.filter first
+    to avoid duplicate creation.
     """
-    pass
+    from evennia.utils.create import create_script
+    from evennia.scripts.models import ScriptDB
+    from world.matchmaking import MatchmakingScript
+
+    if not ScriptDB.objects.filter(db_key="matchmaking").exists():
+        create_script(MatchmakingScript)
 
 
 def at_server_stop():
