@@ -50,6 +50,19 @@ class Character(ObjectParent, DefaultCharacter):
             self.grid_rank = "User"
         # faction intentionally left as None when unset; Epic 5 assigns it.
 
+        # Starter disc — one per character, idempotent.
+        existing = [obj for obj in self.contents
+                    if obj.tags.has("starter-disc", category="inventory")]
+        if not existing:
+            from evennia.utils.create import create_object
+            disc = create_object(
+                typeclass="typeclasses.discs.Disc",
+                key="identity disc",
+                location=self,
+                home=self,
+            )
+            disc.tags.add("starter-disc", category="inventory")
+
     # ------------------------------------------------------------------
     # Stat mutators — each clamps to its respective range.
     # No combat math here; these are pure stat-mutation primitives.
