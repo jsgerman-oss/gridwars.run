@@ -9,8 +9,8 @@ Coverage:
   5. Refuse message contains the required level number.
   6. Grid Junction room exists after build().
   7. Grid Junction is reachable from Daemon Gate via "deeper" exit.
-  8. build_junction_topology skips absent zone rooms silently (no error).
-  9. build_junction_topology creates level-gated exits when zone rooms exist.
+  8. build_junction_topology is idempotent (second call creates 0 exits).
+  9. build() wires LevelGateExit from Grid Junction to zone entry rooms.
  10. LevelGateExit.at_traverse uses min_level=1 default when attr is missing.
 
 Uses EvenniaTest (real Django DB) for DB-backed cases.
@@ -240,24 +240,24 @@ class TestGridJunctionSector(EvenniaTest):
         )
 
     # ------------------------------------------------------------------
-    # 8. build_junction_topology skips absent zone rooms silently
+    # 8. build_junction_topology is idempotent (second call creates 0 exits)
     # ------------------------------------------------------------------
 
-    def test_junction_topology_skips_absent_zones(self):
-        """build_junction_topology returns 0 when no zone rooms exist (no e19.7 data)."""
+    def test_junction_topology_is_idempotent(self):
+        """build_junction_topology returns 0 on a second call (all exits already exist)."""
         junction_rooms = search_tag(key="grid_junction", category=self.CATEGORY)
         self.assertEqual(len(junction_rooms), 1)
         junction_room = junction_rooms[0]
 
-        # Import the function directly from the loaded namespace.
+        # setUp already ran build(), which wired topology once.
+        # A second call must be a no-op (all exits already tagged).
         _, ns = _load_build_fn()
         build_junction_topology = ns["build_junction_topology"]
 
-        # No zone rooms exist in this test DB, so topology wiring is a no-op.
         exits_created = build_junction_topology(junction_room)
         self.assertEqual(
             exits_created, 0,
-            f"Expected 0 exits when zones absent, got {exits_created}",
+            f"Expected 0 exits on second topology call (idempotency), got {exits_created}",
         )
 
     # ------------------------------------------------------------------
@@ -265,41 +265,17 @@ class TestGridJunctionSector(EvenniaTest):
     # ------------------------------------------------------------------
 
     def test_junction_topology_creates_gated_exit_when_zone_exists(self):
-        """A synthetic zone entry room causes build_junction_topology to create a LevelGateExit."""
-        from evennia.utils.create import create_object
-
-        junction_rooms = search_tag(key="grid_junction", category=self.CATEGORY)
-        self.assertEqual(len(junction_rooms), 1)
-        junction_room = junction_rooms[0]
-
-        # Create a synthetic zone entry room tagged as the first datastream variant r0.
-        zone_entry = create_object(
-            typeclass="evennia.objects.objects.DefaultRoom",
-            key="Test Datastream Entry",
-            nohome=True,
-            tags=[
-                ("room:datastream:0:r0", "world_build"),
-                ("gridwars-zones", "world_build"),
-            ],
-        )
-
-        _, ns = _load_build_fn()
-        build_junction_topology = ns["build_junction_topology"]
-        exits_created = build_junction_topology(junction_room)
-
-        # Should create the forward LevelGateExit + return exit = 2.
-        self.assertGreaterEqual(
-            exits_created, 1,
-            f"Expected >= 1 exit created for synthetic zone, got {exits_created}",
-        )
-
-        # Verify the forward exit has the correct typeclass.
+        """build() wires LevelGateExit exits from Grid Junction to zone entry rooms."""
+        # setUp already ran build(), which called build_all_zones() then
+        # build_junction_topology(). Verify the forward exit to datastream-north
+        # exists and has the correct typeclass.
         from typeclasses.exits import LevelGateExit
+
         forward_slug = "grid_junction__exit__datastream-north"
         forward_exits = search_tag(key=forward_slug, category=self.CATEGORY)
         self.assertEqual(
             len(forward_exits), 1,
-            f"Expected 1 forward LevelGateExit, got {len(forward_exits)}",
+            f"Expected 1 forward LevelGateExit tagged '{forward_slug}', got {len(forward_exits)}",
         )
         self.assertIsInstance(
             forward_exits[0],
@@ -307,5 +283,14 @@ class TestGridJunctionSector(EvenniaTest):
             f"Forward exit typeclass is {type(forward_exits[0])}, expected LevelGateExit",
         )
 
-        # Clean up synthetic room.
-        zone_entry.delete()
+        # Verify destination is the correct zone entry room.
+        from world.zones.generator import generate_zone as _gen
+        entry_slug = _gen("datastream", 0).rooms[0].slug
+        entry_tag = f"room:datastream:0:{entry_slug}"
+        entry_rooms = search_tag(key=entry_tag, category=self.CATEGORY)
+        self.assertEqual(len(entry_rooms), 1, f"Expected zone entry room tagged '{entry_tag}'")
+        self.assertEqual(
+            forward_exits[0].destination.id,
+            entry_rooms[0].id,
+            "datastream-north exit destination does not point to the correct zone entry room",
+        )
