@@ -11,7 +11,7 @@ RUN apt-get update \
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir evennia==6.0.5
+RUN pip install --no-cache-dir evennia==6.0.0
 
 COPY --chown=evennia:evennia . .
 
