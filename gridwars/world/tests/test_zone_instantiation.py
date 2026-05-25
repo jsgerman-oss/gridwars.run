@@ -163,10 +163,13 @@ try:
             rooms = _zone_rooms()
             self.assertGreater(len(rooms), 0, "No zone rooms found")
             for room in rooms:
-                table = room.db.daemon_spawn_table
+                # Coerce to list first: Evennia stores list attributes as
+                # _SaverList (a list subclass), which fails assertIsInstance(…, list)
+                # in some environments. list() normalises either form.
+                table = list(room.db.daemon_spawn_table)
                 self.assertIsInstance(
                     table, list,
-                    f"Room {room.key!r} missing list daemon_spawn_table, got {type(table)}",
+                    f"Room {room.key!r} missing list daemon_spawn_table, got {type(room.db.daemon_spawn_table)}",
                 )
 
         def test_spawn_table_entries_have_required_keys(self):
