@@ -11,7 +11,7 @@ decline: clears the pending state.
 LD3 adds the in-arena duel mechanic.
 """
 from evennia import Command
-from evennia.utils.delay import delay
+from evennia.utils.utils import delay
 
 from world.duels import create_arena
 
