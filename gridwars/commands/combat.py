@@ -12,7 +12,11 @@ to Users' Sector via tag lookup, target.reset_for_respawn(...),
 attacker.gain_experience(XP).
 
 XP rules:
-  PvP (target is a player Character): attacker.gain_experience(EXP_ON_VICTORY).
+  PvP inside a DuelArena: _defeat skips the XP grant entirely; the duel
+    end-hook (handle_duel_strike) awards EXP_ON_VICTORY + BONUS_XP_ON_WIN
+    when the STRIKES_TO_WIN threshold is reached. This prevents double-grant
+    when a killing strike simultaneously reaches the duel score threshold.
+  PvP outside a DuelArena: attacker.gain_experience(EXP_ON_VICTORY).
   PvE (target is a Daemon):
     - per-strike XP: gain_experience(strike_xp(daemon_level)) on every hit.
     - kill XP:       gain_experience(kill_xp(daemon_level, zone_band_min,
@@ -222,6 +226,10 @@ class CmdStrike(Command):
             )
 
         # Compute XP before moving target (we need the room's zone metadata).
+        # PvP inside a DuelArena: skip XP here — handle_duel_strike awards
+        # EXP_ON_VICTORY + BONUS_XP_ON_WIN exclusively when the duel threshold
+        # is reached (even if the killing strike also zeros the target's
+        # integrity). Granting XP in both places would double-count.
         if _is_daemon(target):
             dlvl = _daemon_level(target)
             bmin = _zone_band_min(target.location)
@@ -229,8 +237,20 @@ class CmdStrike(Command):
             xp_award = _kill_xp(dlvl, bmin, plvl)
             xp_label = f"Daemon L{dlvl} kill XP"
         else:
-            xp_award = EXP_ON_VICTORY
-            xp_label = "Victory XP"
+            # PvP: only grant XP when NOT inside a DuelArena. Duel XP is
+            # handled exclusively by handle_duel_strike to avoid double-grant.
+            in_duel = (
+                attacker.location is not None
+                and attacker.location.is_typeclass(
+                    "typeclasses.duel_arenas.DuelArena", exact=False
+                )
+            )
+            if in_duel:
+                xp_award = 0
+                xp_label = None  # duel hook will message the winner
+            else:
+                xp_award = EXP_ON_VICTORY
+                xp_label = "Victory XP"
 
         # Move target to Users' Sector via tag lookup (no fragile dbref).
         spawn = search_tag(USERS_SECTOR_TAG, category=USERS_SECTOR_CATEGORY)
@@ -238,12 +258,13 @@ class CmdStrike(Command):
             target.move_to(spawn[0], quiet=True)
         target.reset_for_respawn(min_integrity=RESPAWN_INTEGRITY)
 
-        attacker.gain_experience(xp_award)
+        if xp_award:
+            attacker.gain_experience(xp_award)
+            attacker.msg(
+                f"|g{xp_label} +{xp_award}|n. (Now: |g{attacker.experience}|n)"
+            )
         target.msg(
             f"|wYou re-spawn in|n |cUsers' Sector|n|w with|n |g{target.integrity}|n |wintegrity.|n"
-        )
-        attacker.msg(
-            f"|g{xp_label} +{xp_award}|n. (Now: |g{attacker.experience}|n)"
         )
 
         # If a daemon was defeated, clear the combat flag for that room.

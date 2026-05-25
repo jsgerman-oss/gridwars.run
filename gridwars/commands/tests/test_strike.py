@@ -18,6 +18,7 @@ from evennia.utils import create
 from evennia.utils.test_resources import EvenniaCommandTest
 
 from commands.combat import CmdStrike
+from commands.duels import CmdAccept
 from typeclasses.characters import Character
 from world.combat import (
     BASE_DAMAGE,
@@ -27,6 +28,7 @@ from world.combat import (
     USERS_SECTOR_CATEGORY,
     USERS_SECTOR_TAG,
 )
+from world.duels_score import BONUS_XP_ON_WIN, STRIKES_TO_WIN
 
 
 class StrikeTestCase(EvenniaCommandTest):
@@ -138,4 +140,71 @@ class StrikeTestCase(EvenniaCommandTest):
             self.char1.experience,
             attacker_xp_before + EXP_ON_VICTORY,
             f"Attacker XP should have grown by {EXP_ON_VICTORY}.",
+        )
+
+
+class DuelKillingStrikeXPTestCase(EvenniaCommandTest):
+    """
+    Regression test for double-XP bug (gridwars_run-ss0).
+
+    A strike that simultaneously reduces target.integrity to 0 AND reaches
+    the STRIKES_TO_WIN duel threshold must grant exactly
+    EXP_ON_VICTORY + BONUS_XP_ON_WIN XP — never double (20 XP was the bug).
+
+    The scenario: char2 enters the arena at low integrity (BASE_DAMAGE), so
+    the very first (and only) strike both kills and completes the duel.
+    """
+
+    character_typeclass = Character
+
+    def setUp(self):
+        super().setUp()
+        # Users' Sector so defeat→respawn can move the target out.
+        self.spawn_room = create.create_object(
+            "evennia.objects.objects.DefaultRoom",
+            key="Users' Sector",
+            tags=[(USERS_SECTOR_TAG, USERS_SECTOR_CATEGORY)],
+        )
+        # Clear any challenge/duel state.
+        self.char1.db.pending_challenge_from = None
+        self.char2.db.pending_challenge_from = None
+
+    def test_killing_strike_in_duel_grants_exactly_victory_plus_bonus_xp(self):
+        """
+        A strike that zeros target integrity AND trips STRIKES_TO_WIN must
+        yield exactly EXP_ON_VICTORY + BONUS_XP_ON_WIN, never more.
+
+        Observed (buggy): 20 XP (_defeat: +5, handle_duel_strike: +15).
+        Expected (fixed):  15 XP (handle_duel_strike only).
+        """
+        # Put chars in a DuelArena via accept flow.
+        self.char2.db.pending_challenge_from = self.char1
+        self.call(CmdAccept(), "", caller=self.char2)
+
+        arena = self.char1.location
+        self.assertTrue(
+            arena.is_typeclass("typeclasses.duel_arenas.DuelArena", exact=False),
+            "Should be inside a DuelArena after accept.",
+        )
+
+        # Pre-fill the duel score to one below threshold so the next strike
+        # both kills (integrity → 0) and completes the duel simultaneously.
+        arena.db.duel_scores = {str(self.char1.id): STRIKES_TO_WIN - 1}
+
+        # Set char2 integrity to exactly BASE_DAMAGE so any strike kills.
+        self.char2.integrity = BASE_DAMAGE
+
+        xp_before = self.char1.experience
+        self.char1.db.last_strike_time = None  # clear cooldown
+        self.call(CmdStrike(), self.char2.key, caller=self.char1)
+
+        expected_xp = EXP_ON_VICTORY + BONUS_XP_ON_WIN  # 15
+        actual_xp_gained = self.char1.experience - xp_before
+
+        self.assertEqual(
+            actual_xp_gained,
+            expected_xp,
+            f"Expected exactly {expected_xp} XP (EXP_ON_VICTORY={EXP_ON_VICTORY} + "
+            f"BONUS_XP_ON_WIN={BONUS_XP_ON_WIN}), got {actual_xp_gained}. "
+            f"Double-grant bug may have re-appeared.",
         )
