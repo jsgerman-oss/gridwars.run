@@ -236,12 +236,11 @@ try:
             self.assertGreaterEqual(count, 250, f"Too few zone rooms: {count}")
             self.assertLessEqual(count, 500, f"Too many zone rooms: {count}")
 
-        def test_zone_rooms_ready_for_repop_scripts(self):
+        def test_zone_rooms_carry_repop_data(self):
             """Every built zone room carries the data ZoneRepopScript needs.
 
-            build_all_zones() does not auto-start scripts (operators start them
-            after the build); this test verifies the repop-ready preconditions:
-            each zone room has zone_id, level_band, and daemon_spawn_table set.
+            Verifies repop-ready preconditions: each zone room has zone_id,
+            level_band, and daemon_spawn_table set.
             """
             rooms = _zone_rooms()
             self.assertGreater(len(rooms), 0, "No zone rooms found")
@@ -260,6 +259,24 @@ try:
                     self.assertTrue(
                         room.attributes.has("daemon_spawn_table"),
                         f"{room.key!r} missing daemon_spawn_table attribute",
+                    )
+
+        def test_42_repop_scripts_running_after_build(self):
+            """build_all_zones() auto-starts exactly 42 ZoneRepopScript instances."""
+            from evennia.scripts.models import ScriptDB
+            scripts = list(ScriptDB.objects.filter(
+                db_typeclass_path="world.zones.repop.ZoneRepopScript"
+            ))
+            self.assertEqual(
+                len(scripts), 42,
+                f"Expected 42 ZoneRepopScript instances; found {len(scripts)}: "
+                f"{[s.key for s in scripts]!r}",
+            )
+            for script in scripts:
+                with self.subTest(script=script.key):
+                    self.assertTrue(
+                        script.db_persistent,
+                        f"ZoneRepopScript {script.key!r} is not persistent",
                     )
 
         def test_zone_room_count_at_least_250(self):

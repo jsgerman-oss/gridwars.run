@@ -49,6 +49,10 @@ from world.zones.archetypes import ARCHETYPES
 from world.zones.generator import generate_zone
 from world.zones.prose_pools import PROSE_POOLS
 
+# Script typeclass path — avoids a hard import at module level (Evennia may
+# not be fully initialised when this module is imported in tests).
+REPOP_SCRIPT_TYPECLASS = "world.zones.repop.ZoneRepopScript"
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -207,6 +211,57 @@ def _ensure_zone_exit(
 
 
 # ---------------------------------------------------------------------------
+# Repop script lifecycle
+# ---------------------------------------------------------------------------
+
+def _ensure_zone_repop_script(
+    archetype_id: str,
+    variant_index: int,
+    entry_room: Any,
+) -> bool:
+    """Start a ZoneRepopScript for this zone if one is not already running.
+
+    Idempotent: if a script with key ``"zone_repop:<archetype_id>:<variant_index>"``
+    already exists (persistent=True, interval set), this is a no-op.
+
+    The script is stored on *entry_room* so it has a natural DB anchor.
+    Interval is taken from the archetype's ``repop_cadence_sec``.
+
+    Returns True if a new script was created, False if one already existed.
+    """
+    from evennia.utils.create import create_script
+    from evennia.utils.search import search_script
+
+    script_key = f"zone_repop:{archetype_id}:{variant_index}"
+    existing = search_script(script_key)
+    if existing:
+        return False
+
+    archetype = ARCHETYPES.get(archetype_id, {})
+    cadence = int(archetype.get("repop_cadence_sec", 90))
+    zone_id = f"{archetype_id}:{variant_index}"
+    level_band = archetype.get("level_band", (1, 5))
+    daemon_palette = archetype.get("daemon_palette", ["typeclasses.daemons.Daemon"])
+
+    script = create_script(
+        typeclass=REPOP_SCRIPT_TYPECLASS,
+        key=script_key,
+        obj=entry_room,
+        interval=cadence,
+        persistent=True,
+        autostart=True,
+        start_delay=True,
+    )
+    script.db.zone_id = zone_id
+    script.db.zone_archetype = archetype_id
+    script.db.level_band_min = int(level_band[0])
+    script.db.level_band_max = int(level_band[1])
+    script.db.daemon_palette = list(daemon_palette)
+    script.db.daemon_target = 1  # default; overridden by admin tooling if needed
+    return True
+
+
+# ---------------------------------------------------------------------------
 # Core builder
 # ---------------------------------------------------------------------------
 
@@ -253,7 +308,36 @@ def _build_one_zone(archetype_id: str, variant_index: int) -> dict[str, int]:
         )
         exits_created += 1
 
+    # Start the repop ticker for this zone (idempotent).
+    entry_room = next(iter(slug_to_room.values())) if slug_to_room else None
+    if entry_room is not None:
+        _ensure_zone_repop_script(archetype_id, variant_index, entry_room)
+
     return {"rooms": len(slug_to_room), "exits": exits_created}
+
+
+# ---------------------------------------------------------------------------
+# Repop script recovery for already-existing zones
+# ---------------------------------------------------------------------------
+
+def _ensure_repop_for_existing_zone(archetype_id: str, variant_index: int) -> None:
+    """Ensure a repop script is running for a zone whose rooms already exist.
+
+    Called during the idempotency-skip path of build_all_zones() so that
+    calling build_all_zones() on a world built before auto-start was added
+    still results in all 42 repop scripts running.
+    """
+    from evennia.utils.search import search_tag
+
+    zone_tag = _zone_tag(archetype_id, variant_index)
+    zone_objects = search_tag(key=zone_tag, category=ZONE_CATEGORY)
+    rooms = [
+        o for o in zone_objects
+        if not (hasattr(o, "destination") and o.destination is not None)
+    ]
+    if not rooms:
+        return
+    _ensure_zone_repop_script(archetype_id, variant_index, rooms[0])
 
 
 # ---------------------------------------------------------------------------
@@ -302,6 +386,10 @@ def build_all_zones(
         for variant_index in range(count):
             if _zone_exists(archetype_id, variant_index):
                 zones_skipped += 1
+                # Zone rooms already exist; ensure repop script is running
+                # in case it was never started (e.g. first run before this
+                # feature landed, or manual script deletion).
+                _ensure_repop_for_existing_zone(archetype_id, variant_index)
                 continue
             result = _build_one_zone(archetype_id, variant_index)
             zones_built += 1
