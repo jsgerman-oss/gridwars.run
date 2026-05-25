@@ -1,10 +1,12 @@
 """
 Unit tests for world.build_grid.build().
 
-Covers (gridwars_run-62h.2 / Epic 9):
-  1. build() creates exactly 5 rooms and 8 exits tagged with ('gridwars-core', 'world_build').
+Covers (gridwars_run-62h.2 / Epic 9, gridwars_run-wpj / e16.2):
+  1. build() creates exactly 6 rooms and 10 exits tagged with ('gridwars-core', 'world_build').
   2. build() is idempotent — calling it twice produces the same counts.
   3. The Users' Sector room is findable by its slug tag.
+  4. The Uplink Node room is findable by its slug tag (e16.2).
+  5. Uplink Node's "jack-in" exit count is stable across two build() calls (e16.2).
 
 Uses EvenniaTest (real Django DB, full Evennia environment).
 
@@ -97,23 +99,23 @@ class BuildGridTestCase(EvenniaTest):
         ]
 
     # ------------------------------------------------------------------
-    # 1. 5 rooms + 8 exits created
+    # 1. 6 rooms + 10 exits created
     # ------------------------------------------------------------------
 
-    def test_build_creates_5_rooms_and_8_exits(self):
-        """After build(), count 5 rooms and 8 exits tagged gridwars-core/world_build."""
+    def test_build_creates_6_rooms_and_10_exits(self):
+        """After build(), count 6 rooms and 10 exits tagged gridwars-core/world_build."""
         tagged = self._tagged_objects()
         rooms = self._rooms(tagged)
         exits = self._exits(tagged)
         self.assertEqual(
-            len(rooms), 5,
-            f"Expected 5 rooms, got {len(rooms)}: {[r.key for r in rooms]}\n"
+            len(rooms), 6,
+            f"Expected 6 rooms, got {len(rooms)}: {[r.key for r in rooms]}\n"
             f"All tagged ({len(tagged)}): "
             f"{[(o.key, getattr(o, 'destination', '(no dest)')) for o in tagged]}",
         )
         self.assertEqual(
-            len(exits), 8,
-            f"Expected 8 exits, got {len(exits)}: {[e.key for e in exits]}",
+            len(exits), 10,
+            f"Expected 10 exits, got {len(exits)}: {[e.key for e in exits]}",
         )
 
     # ------------------------------------------------------------------
@@ -128,12 +130,12 @@ class BuildGridTestCase(EvenniaTest):
         rooms = self._rooms(tagged)
         exits = self._exits(tagged)
         self.assertEqual(
-            len(rooms), 5,
-            f"Idempotency fail — rooms: expected 5, got {len(rooms)}",
+            len(rooms), 6,
+            f"Idempotency fail — rooms: expected 6, got {len(rooms)}",
         )
         self.assertEqual(
-            len(exits), 8,
-            f"Idempotency fail — exits: expected 8, got {len(exits)}",
+            len(exits), 10,
+            f"Idempotency fail — exits: expected 10, got {len(exits)}",
         )
 
     # ------------------------------------------------------------------
@@ -148,3 +150,42 @@ class BuildGridTestCase(EvenniaTest):
             f"Expected 1 users_sector room, got {len(results)}: {[r.key for r in results]}",
         )
         self.assertEqual(results[0].key, "Users' Sector")
+
+    # ------------------------------------------------------------------
+    # 4. Uplink Node resolves via slug tag (e16.2)
+    # ------------------------------------------------------------------
+
+    def test_build_uplink_node_resolves(self):
+        """search_tag('uplink_node', category='world_build') returns exactly 1 room."""
+        results = search_tag(key="uplink_node", category=self.CATEGORY)
+        self.assertEqual(
+            len(results), 1,
+            f"Expected 1 uplink_node room, got {len(results)}: {[r.key for r in results]}",
+        )
+        self.assertEqual(results[0].key, "Uplink Node")
+
+    # ------------------------------------------------------------------
+    # 5. Uplink Node "jack-in" exit count is stable across two build() calls (e16.2)
+    # ------------------------------------------------------------------
+
+    def test_uplink_node_jackin_exit_idempotent(self):
+        """Calling build() twice keeps exactly one 'jack-in' exit from uplink_node."""
+        exit_slug = "uplink_node__exit__jack-in"
+
+        exits_first = search_tag(key=exit_slug, category=self.CATEGORY)
+        count_first = len(exits_first)
+        self.assertEqual(
+            count_first, 1,
+            f"Expected 1 jack-in exit after first build, got {count_first}",
+        )
+
+        # Second build — must remain idempotent.
+        self._build_fn()
+
+        exits_second = search_tag(key=exit_slug, category=self.CATEGORY)
+        count_second = len(exits_second)
+        self.assertEqual(
+            count_second, 1,
+            f"Expected 1 jack-in exit after second build, got {count_second} "
+            f"(idempotency failure — exit duplicated)",
+        )
