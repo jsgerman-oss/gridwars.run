@@ -43,6 +43,12 @@ def end_arena(arena, winner=None):
                 before deletion so callers can read it before calling
                 this function. Not required (LD3 populates winner_id).
     """
+    # Clear combat flag before participants move out so the repop ticker
+    # never sees a live combat_active flag on a departing/deleted room.
+    from world.room_state import clear_combat_active
+
+    clear_combat_active(arena)
+
     for char_id_str, origin_id in (arena.origins or {}).items():
         try:
             char = ObjectDB.objects.get(id=int(char_id_str))

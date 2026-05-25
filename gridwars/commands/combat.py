@@ -19,19 +19,30 @@ XP rules:
                      player_level)) on defeat (replaces EXP_ON_VICTORY).
   Disc XP is awarded separately via equipped.gain_xp() in both modes.
 
+combat_active flag (Epic 19 prereq):
+  Set when a Daemon is involved in a strike (daemon-as-caller covers the
+  DaemonPatrol path). Cleared when a daemon is defeated. Also cleared by
+  Room.at_object_leave when the last player exits.
+
 Characters are NEVER deleted.
 """
 import time
 from random import randint
+
 from evennia import Command
 from evennia.utils.search import search_tag
 
 from world.combat import (
-    BASE_DAMAGE, RANDOM_BONUS_MAX, EXP_ON_VICTORY, RESPAWN_INTEGRITY,
-    USERS_SECTOR_TAG, USERS_SECTOR_CATEGORY,
+    BASE_DAMAGE,
+    EXP_ON_VICTORY,
+    RANDOM_BONUS_MAX,
+    RESPAWN_INTEGRITY,
+    USERS_SECTOR_CATEGORY,
+    USERS_SECTOR_TAG,
 )
 from typeclasses.discs import XP_PER_STRIKE, XP_PER_KILL
 from world.zones.exp import kill_xp as _kill_xp, strike_xp as _strike_xp
+from world.room_state import clear_combat_active, set_combat_active
 
 
 def _is_character(obj) -> bool:
@@ -101,6 +112,7 @@ class CmdStrike(Command):
     integrity. Attackers gain experience on victory. Strikes only work
     on Characters in your current sector — no cross-sector reach.
     """
+
     key = "strike"
     aliases = []
     locks = "cmd:all()"
@@ -154,8 +166,17 @@ class CmdStrike(Command):
         # Stamp cooldown timestamp.
         caller.db.last_strike_time = now
 
+        # Set room combat_active when a daemon is involved so the repop ticker
+        # knows to skip this room during re-spawn cycles. Primary path is
+        # daemon-as-caller (DaemonPatrol); daemon-as-target wired for future use.
+        if _is_daemon(caller) or _is_daemon(target):
+            set_combat_active(caller.location)
+
         if equipped:
-            caller.msg(f"|wYou strike|n |c{target.key}|n |wwith|n {equipped.key} |wfor|n |y{amount}|n |wintegrity.|n")
+            caller.msg(
+                f"|wYou strike|n |c{target.key}|n |wwith|n {equipped.key}"
+                f" |wfor|n |y{amount}|n |wintegrity.|n"
+            )
         else:
             caller.msg(f"|wYou strike|n |c{target.key}|n |wfor|n |y{amount}|n |wintegrity.|n")
         target.msg(f"|c{caller.key}|n |rstrikes you for|n |y{amount}|n |rintegrity.|n")
@@ -187,9 +208,13 @@ class CmdStrike(Command):
         loc = caller.location
         if loc and loc.is_typeclass("typeclasses.duel_arenas.DuelArena", exact=False):
             from world.duels_score import handle_duel_strike
+
             handle_duel_strike(arena=loc, attacker=caller, target=target)
 
     def _defeat(self, attacker, target):
+        # Record the room before the target moves so we can clear the flag.
+        combat_room = target.location
+
         # Room broadcast
         if target.location:
             target.location.msg_contents(
@@ -220,3 +245,9 @@ class CmdStrike(Command):
         attacker.msg(
             f"|g{xp_label} +{xp_award}|n. (Now: |g{attacker.experience}|n)"
         )
+
+        # If a daemon was defeated, clear the combat flag for that room.
+        # Room.at_object_leave handles the player-leaves case; this handles
+        # the daemon-dies case explicitly.
+        if _is_daemon(target):
+            clear_combat_active(combat_room)
