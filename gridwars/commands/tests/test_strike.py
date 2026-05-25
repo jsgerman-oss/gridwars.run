@@ -85,14 +85,15 @@ class StrikeTestCase(EvenniaCommandTest):
     # ------------------------------------------------------------------
 
     def test_strike_on_non_character_refused(self):
-        """Striking a plain object (not a Character) is rejected by the typeclass filter."""
+        """Striking a plain object (not a Character) is rejected."""
         dummy = create.create_object(
             "evennia.objects.objects.DefaultObject",
             key="rock",
             location=self.char1.location,
         )
         result = self.call(CmdStrike(), "rock", caller=self.char1)
-        self.assertIn("No character", result)
+        # The search now finds the object and the typeclass guard rejects it.
+        self.assertIn("only strike other characters", result)
 
     # ------------------------------------------------------------------
     # 5. Defeat triggers respawn + XP grant + target survives in DB
