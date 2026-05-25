@@ -26,6 +26,7 @@ from world.combat import (
     USERS_SECTOR_CATEGORY,
     USERS_SECTOR_TAG,
 )
+from world.duels_score import BONUS_XP_ON_WIN
 
 
 class DuelCommandTestCase(EvenniaCommandTest):
@@ -144,8 +145,8 @@ class DuelCommandTestCase(EvenniaCommandTest):
     def test_duel_to_completion_winner_xp_and_return(self):
         """
         Full duel flow: challenge→accept spawns arena, 3 strikes in arena
-        triggers end_arena — char1 (winner) gets EXP_ON_VICTORY, both return
-        to room1, and the arena object is deleted from the DB.
+        triggers end_arena — char1 (winner) gets EXP_ON_VICTORY + BONUS_XP_ON_WIN
+        (e17.4), both return to room1, and the arena object is deleted from the DB.
         """
         # Record origins and XP before duel.
         char1_origin = self.char1.location  # room1
@@ -189,11 +190,12 @@ class DuelCommandTestCase(EvenniaCommandTest):
             ObjectDB.objects.filter(id=arena_id).exists(),
             "Arena should be deleted from DB after duel ends.",
         )
-        # Winner gained XP.
+        # Winner gained XP: base EXP_ON_VICTORY + BONUS_XP_ON_WIN (e17.4).
+        expected_xp = EXP_ON_VICTORY + BONUS_XP_ON_WIN
         self.assertEqual(
             self.char1.experience,
-            char1_xp_before + EXP_ON_VICTORY,
-            f"char1 should have gained {EXP_ON_VICTORY} XP.",
+            char1_xp_before + expected_xp,
+            f"char1 should have gained {expected_xp} XP (base + bonus).",
         )
 
     # ------------------------------------------------------------------
