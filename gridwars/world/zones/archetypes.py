@@ -38,7 +38,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (3, 6),
         "topology_options": ["linear"],
         "daemon_palette": [
-            "typeclasses.daemons.TrackerDaemon",
+            "typeclasses.daemon_variants.StrayPacket",
         ],
         "repop_cadence_sec": 120,
         "default_flavor_keys": [
@@ -54,8 +54,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (4, 7),
         "topology_options": ["linear", "branching"],
         "daemon_palette": [
-            "typeclasses.daemons.TrackerDaemon",
-            "typeclasses.daemons.SentinelDaemon",
+            "typeclasses.daemon_variants.ReadOnlySentry",
         ],
         "repop_cadence_sec": 150,
         "default_flavor_keys": [
@@ -72,8 +71,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (4, 8),
         "topology_options": ["linear", "ring"],
         "daemon_palette": [
-            "typeclasses.daemons.SentinelDaemon",
-            "typeclasses.daemons.PatrolDaemon",
+            "typeclasses.daemon_variants.ICEPicket",
         ],
         "repop_cadence_sec": 90,
         "default_flavor_keys": [
@@ -90,8 +88,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (5, 9),
         "topology_options": ["ring", "branching"],
         "daemon_palette": [
-            "typeclasses.daemons.PatrolDaemon",
-            "typeclasses.daemons.SentinelDaemon",
+            "typeclasses.daemon_variants.JunctionRoamer",
         ],
         "repop_cadence_sec": 100,
         "default_flavor_keys": [
@@ -108,8 +105,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (5, 10),
         "topology_options": ["linear", "branching"],
         "daemon_palette": [
-            "typeclasses.daemons.PatrolDaemon",
-            "typeclasses.daemons.HunterDaemon",
+            "typeclasses.daemon_variants.ForgeDaemon",
         ],
         "repop_cadence_sec": 80,
         "default_flavor_keys": [
@@ -126,8 +122,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (6, 10),
         "topology_options": ["branching", "ring"],
         "daemon_palette": [
-            "typeclasses.daemons.HunterDaemon",
-            "typeclasses.daemons.CorruptedDaemon",
+            "typeclasses.daemon_variants.MutatedCacheDaemon",
         ],
         "repop_cadence_sec": 70,
         "default_flavor_keys": [
@@ -144,8 +139,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (6, 12),
         "topology_options": ["ring", "branching"],
         "daemon_palette": [
-            "typeclasses.daemons.CorruptedDaemon",
-            "typeclasses.daemons.MCPShardDaemon",
+            "typeclasses.daemon_variants.FragmentGuardian",
         ],
         "repop_cadence_sec": 60,
         "default_flavor_keys": [
@@ -162,9 +156,7 @@ ARCHETYPES: dict[str, dict[str, Any]] = {
         "room_count_range": (8, 14),
         "topology_options": ["branching"],
         "daemon_palette": [
-            "typeclasses.daemons.MCPShardDaemon",
-            "typeclasses.daemons.GridcoreDaemon",
-            "typeclasses.daemons.CorruptedDaemon",
+            "typeclasses.daemon_variants.GridcoreElite",
         ],
         "repop_cadence_sec": 45,
         "default_flavor_keys": [

@@ -181,7 +181,7 @@ def _ensure_exit(from_slug, from_room, to_room, exit_name, aliases):
 # ---------------------------------------------------------------------------
 
 def build():
-    """Create the five GridWars sectors and connect them with cardinal exits."""
+    """Create the five GridWars sectors, connect them, then instantiate all 42 zones."""
     rooms = {}
     for slug, spec in SECTORS.items():
         rooms[slug] = _get_or_create_room(slug, spec)
@@ -196,6 +196,10 @@ def build():
         f"{len(rooms)} sectors, {exits_built} exits "
         f"(tag='{TAG_KEY}', category='{CATEGORY}')."
     )
+
+    # Instantiate the 42 procedurally-generated zone variants (e19.7).
+    from world.zones.build_zones import build_all_zones
+    build_all_zones()
 
 
 if __name__ == "__main__":
