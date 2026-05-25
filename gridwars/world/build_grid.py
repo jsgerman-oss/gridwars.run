@@ -25,6 +25,8 @@ TAG_KEY = "gridwars-core"
 
 TYPECLASS_ROOM = "evennia.objects.objects.DefaultRoom"
 TYPECLASS_EXIT = "evennia.objects.objects.DefaultExit"
+TYPECLASS_UPLINK_NODE = "typeclasses.welcome_program.UplinkNodeRoom"
+TYPECLASS_WELCOME_PROGRAM = "typeclasses.welcome_program.WelcomeProgram"
 
 # ---------------------------------------------------------------------------
 # Sector definitions
@@ -89,6 +91,7 @@ SECTORS = {
     },
     "uplink_node": {
         "key": "Uplink Node",
+        "typeclass": TYPECLASS_UPLINK_NODE,
         "desc": (
             "Awareness arrives in pulses. "
             "The first thing a new program perceives is the Grid clock -- "
@@ -143,8 +146,9 @@ def _get_or_create_room(slug, spec):
     existing = search_tag(key=slug, category=CATEGORY)
     if existing:
         return existing[0]
+    typeclass = spec.get("typeclass", TYPECLASS_ROOM)
     room = create_object(
-        typeclass=TYPECLASS_ROOM,
+        typeclass=typeclass,
         key=spec["key"],
         nohome=True,
         attributes=[("desc", spec["desc"])],
@@ -154,6 +158,27 @@ def _get_or_create_room(slug, spec):
         ],
     )
     return room
+
+
+def _spawn_welcome_program(uplink_room):
+    """Spawn a single WelcomeProgram in *uplink_room* if not already present.
+
+    Idempotent: tagged with ``welcome-program / world_build`` so re-running
+    build() skips creation if one already exists.
+    """
+    existing = search_tag("welcome-program", category=CATEGORY)
+    if existing:
+        return existing[0]
+    npc = create_object(
+        TYPECLASS_WELCOME_PROGRAM,
+        key="Welcome Program",
+        location=uplink_room,
+    )
+    # Tag with the NPC-specific slug only — NOT gridwars-core.
+    # gridwars-core is a geometry tag (rooms + exits); NPCs must not
+    # appear in build_grid room/exit counts.
+    npc.tags.add("welcome-program", category=CATEGORY)
+    return npc
 
 
 def _ensure_exit(from_slug, from_room, to_room, exit_name, aliases):
@@ -181,7 +206,7 @@ def _ensure_exit(from_slug, from_room, to_room, exit_name, aliases):
 # ---------------------------------------------------------------------------
 
 def build():
-    """Create the five GridWars sectors, connect them, then instantiate all 42 zones."""
+    """Create the GridWars sectors, connect them with exits, spawn the Welcome Program, and instantiate all 42 zones."""
     rooms = {}
     for slug, spec in SECTORS.items():
         rooms[slug] = _get_or_create_room(slug, spec)
@@ -190,6 +215,8 @@ def build():
     for from_slug, to_slug, name, aliases in EXITS:
         _ensure_exit(from_slug, rooms[from_slug], rooms[to_slug], name, aliases)
         exits_built += 1
+
+    _spawn_welcome_program(rooms["uplink_node"])
 
     print(
         f"GridWars world build complete: "
