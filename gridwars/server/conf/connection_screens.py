@@ -2,16 +2,14 @@
 """
 GridWars.run connection screens.
 
-Shown to clients on connect (CONNECTION_SCREEN). MOTD is not a
-separate constant in Evennia's idiom — post-login messages are handled
-via at_account_login hooks (Th2). Banner is ≤ 80 visual columns for
-telnet clients. ANSI color via Evennia color codes (|c |g |y |w |n);
+Shown to clients on connect (CONNECTION_SCREEN). Banner is ≤ 78 visual
+columns for telnet clients. ANSI color via Evennia color codes (|c |y |w |n);
 these degrade cleanly on non-ANSI clients.
 """
 
 # Evennia reads any module-level string variable as a candidate screen
 # (picks at random if more than one is defined). We define exactly one.
-# All lines ≤ 80 visual cols. Verified widest line: 72 cols.
+# All lines ≤ 78 visual cols.
 
 CONNECTION_SCREEN = """\
 |c
@@ -22,13 +20,9 @@ CONNECTION_SCREEN = """\
   ╚██████╔╝██║  ██║██║██████╔╝╚███╔███╔╝██║  ██║██║  ██║███████║
    ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
 |n
-|w                       G R I D W A R S . R U N|n
+|y                         · GRIDWARS.RUN ·|n
 
-|y       Full PvP. No limits. Free to play. Open source.|n
+|w  Full PvP. Open source. Telnet |cgame.gridwars.run 4000|w.|n
 
-|c┌──────────────────────────────────────────────────────────────────────┐|n
-|c│|n  |wconnect <handle> <key>|n    |wcreate <handle> <key>|n    |whelp|n             |c│|n
-|c└──────────────────────────────────────────────────────────────────────┘|n
-
-|g      The Grid is live. Programs report. Light trails ignite.|n
+  |wconnect <name> <pw>|n     |wcreate <name> <pw>|n
 """
