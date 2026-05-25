@@ -1,26 +1,57 @@
 #
-# A batch-command file is a way to build a game world
-# in a programmatic way, by placing a sequence of
-# build commands after one another. This allows for
-# using a real text editor to edit e.g. descriptions
-# rather than entering text on the command line.
+# GridWars world bootstrap — batch-code entry point (e19.9).
+#
+# Load in-game with:
+#
+#   @batchcode world.zones.batch
+#
+# This invokes the Python bootstrap module at:
+#
+#   gridwars/world/zones/batch.py  (world.zones.batch)
+#
+# That module calls build_grid.build() which in turn calls
+# build_all_zones().  The full world is built in one idempotent pass:
+#
+#   - 6 core lobby sectors (Users' Sector, Lightcycle Causeway,
+#     Daemon Gate, Archive Node, Combat Grid, Uplink Node)
+#   - 42 procedurally-generated zone variants (8 archetypes x seeded
+#     variants; level bands 1-5 through 25-40)
+#
+# Re-running is safe: every room and exit is get-or-created.
+#
+# Expected zone count: 42 zones across 8 archetypes:
+#   Datastream(8) + Archive Node(6) + ICE Wall(6) + Junction Plaza(4)
+#   + Shard Foundry(5) + Corrupted Cache(5) + MCP Fragment(4)
+#   + Gridcore(4) = 42
+#
+# Zone ID scheme (for admin teleport via search_tag):
+#   zone:datastream:0 .. zone:datastream:7
+#   zone:archive_node:0 .. zone:archive_node:5
+#   zone:ice_wall:0 .. zone:ice_wall:5
+#   zone:junction_plaza:0 .. zone:junction_plaza:3
+#   zone:shard_foundry:0 .. zone:shard_foundry:4
+#   zone:corrupted_cache:0 .. zone:corrupted_cache:4
+#   zone:mcp_fragment:0 .. zone:mcp_fragment:3
+#   zone:gridcore:0 .. zone:gridcore:3
+#
+# Resolve a zone room for @tel:
+#   search_tag(key="zone:<archetype>:<variant>", category="world_build")
+#
+# TODO(e19.8): when Grid Junction sector lands, add a @tel command here
+# so admins can teleport directly to the junction entrance:
+#   @tel #<junction_dbref>
+#
+# See also:
+#   gridwars/world/zones/batch.py        Bootstrap Python entry point
+#   gridwars/world/build_grid.py         Core lobby sector definitions
+#   gridwars/world/zones/build_zones.py  Procgen zone pipeline (e19.7)
 #
 # A batch-command file is loaded with @batchprocess in-game:
 #
-#   @batchprocess[/interactive] tutorial_examples.batch_cmds
+#   @batchprocess[/interactive] world.batch_cmds
 #
-# A # as the first symbol on a line begins a comment and
-# marks the end of a previous command definition. This is important,
-# - every command must be separated by at least one line of comment.
-#
-# All supplied commands are given as normal, on their own line
-# and accept arguments in any format up until the first next
-# comment line begins. Extra whitespace is removed; an empty
-# line in a command definition translates into a newline.
-#
-# See `evennia/contrib/tutorial_examples/batch_cmds.ev` for
-# an example of a batch-command code. See also the batch-code
-# system for loading python-code this way.
+# A # as the first symbol on a line begins a comment and marks the
+# end of a previous command definition.
 #
 
 
