@@ -22,6 +22,7 @@ from commands.combat import CmdStrike
 from commands.duels import CmdAccept, CmdChallenge, CmdDecline
 from commands.equipment import CmdEquip, CmdInventory, CmdUnequip
 from commands.factions import CmdFaction
+from commands.leaderboard import CmdLeaderboard
 from commands.queue import CmdQueue
 from commands.scan import CmdScan
 from commands.status import CmdStatus
@@ -46,6 +47,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         self.add(CmdCapture())
         self.add(CmdFaction())
+        self.add(CmdLeaderboard())
         self.add(CmdStrike())
         self.add(CmdStatus())
         self.add(CmdScan())
