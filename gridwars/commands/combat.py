@@ -21,6 +21,7 @@ from world.combat import (
     BASE_DAMAGE, RANDOM_BONUS_MAX, EXP_ON_VICTORY, RESPAWN_INTEGRITY,
     USERS_SECTOR_TAG, USERS_SECTOR_CATEGORY,
 )
+from typeclasses.discs import XP_PER_STRIKE, XP_PER_KILL
 
 
 def _is_character(obj) -> bool:
@@ -100,8 +101,16 @@ class CmdStrike(Command):
             exclude=[caller, target],
         )
 
-        if target.integrity == 0:
+        is_kill = target.integrity == 0
+        if is_kill:
             self._defeat(caller, target)
+
+        # Grant disc XP after defeat flow so level-up message arrives after respawn notice.
+        if equipped:
+            if is_kill:
+                equipped.gain_xp(XP_PER_KILL)
+            else:
+                equipped.gain_xp(XP_PER_STRIKE)
 
         # In-arena duel scoring — runs AFTER defeat flow so target may have
         # already been moved out by respawn; end_arena handles that gracefully.

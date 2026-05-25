@@ -8,6 +8,7 @@ the registry (Epic 5).
 from commands.command import Command
 from world.factions import get as get_faction
 from world.ownership import rooms_owned_by
+from typeclasses.discs import XP_THRESHOLDS
 
 
 def _bar_color(value: int, ceiling: int = 100) -> str:
@@ -67,6 +68,16 @@ class CmdStatus(Command):
             f"|w  Rank     |n |c{grid_rank}|n",
             "|c╚════════════════════════════════════╝|n",
         ]
+        # Show disc level + XP progress if a disc is equipped.
+        disc = c.db.equipped_disc
+        if disc is not None:
+            lvl = disc.level
+            xp = disc.xp
+            next_xp = XP_THRESHOLDS[lvl] if lvl < len(XP_THRESHOLDS) else xp
+            lines.append(
+                f"|w  Disc     |n |c{disc.key}|n |gL{lvl}|n ({xp}/{next_xp}xp)"
+            )
+
         if faction_name:
             held_count = len(rooms_owned_by(faction_name))
             lines.append(f"|w  Sectors  |n |g{held_count}|n held by your faction")
